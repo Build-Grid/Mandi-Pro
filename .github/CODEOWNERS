@@ -1,0 +1,8 @@
+# Default owners
+* @Build-Grid
+
+# Backend
+/backend/ @Build-Grid
+
+# Frontend
+/frontend/ @Build-Grid
