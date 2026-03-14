@@ -103,7 +103,7 @@ Some features and documentation are still in progress.
 
 Contributions are welcome.
 
-Please read the **[Contributing Guide](../../wiki/Contributing)** before submitting pull requests.
+Please read the **[Contributing Guide](../../wiki/Contributing-Guide)** before submitting pull requests.
 
 ---
 
