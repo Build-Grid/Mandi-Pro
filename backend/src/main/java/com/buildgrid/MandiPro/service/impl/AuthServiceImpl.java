@@ -26,9 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -80,19 +77,16 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.toEntity(registerRequest);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        Set<Role> roles = new HashSet<>();
-        if (registerRequest.getRoles() == null || registerRequest.getRoles().isEmpty()) {
-            Role userRole = roleRepository.findByName(RoleConstants.WORKER)
-                    .orElseThrow(() -> new ResourceNotFoundException("Default role not found"));
-            roles.add(userRole);
-        } else {
-            registerRequest.getRoles().forEach(roleName -> {
-                Role role = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " not found"));
-                roles.add(role);
-            });
+        String roleName = registerRequest.getRole();
+        if (roleName == null || roleName.isEmpty()) {
+            roleName = RoleConstants.WORKER;
         }
-        user.setRoles(roles);
+
+        String finalRoleName = roleName;
+        Role role = roleRepository.findByName(finalRoleName)
+                .orElseThrow(() -> new ResourceNotFoundException("Role " + finalRoleName + " not found"));
+
+        user.setRole(role);
 
         User savedUser = userRepository.save(user);
         log.info(LogMessages.USER_REGISTERED, savedUser.getEmail(), TraceIdUtil.get());

@@ -1,98 +1,86 @@
-# MandiPro Backend Framework
+# 🚀 MandiPro Backend Framework
 
-A production-ready Spring Boot framework with infrastructure-ready components.
+A production-ready Spring Boot framework designed for scalability and robustness. This project provides the essential infrastructure components including security, traceability, and database management, allowing you to focus purely on business logic.
 
-## Tech Stack
-- Java 21
-- Spring Boot 3.4.1 (Stable alternative to requested 4.0.3)
-- Spring Security 6
-- PostgreSQL
-- JWT (jjwt 0.12.6)
-- Flyway (Production only)
-- Springdoc OpenAPI 2.7.0 (Stable alternative to 3.0.0)
-- MapStruct & Lombok
+---
 
-## Setup Instructions
+## 🛠 Tech Stack
 
-1.  **Environment Variables**:
-    - Copy `.env.example` to `.env`.
-    - Configure your PostgreSQL database credentials and JWT secret in `.env`.
+*   **Java 21**
+*   **Spring Boot 3.4.1**
+*   **PostgreSQL**
+*   **Flyway** (Migration tool enabled in all environments)
+*   **Spring Security 6** (Stateless JWT)
+*   **MapStruct 1.6.3** & **Lombok**
+*   **Springdoc OpenAPI 2.7.0**
 
-2.  **Database**:
-    - Ensure PostgreSQL is running.
-    - Create a database named `mandipro`.
+---
 
-3.  **Build**:
-    ```bash
-    mvn clean install
-    ```
+## ⚙️ Setup Instructions
 
-4.  **Run Development**:
-    ```bash
-    mvn spring-boot:run -Dspring-boot.run.profiles=dev
-    ```
-    - In `dev` profile, Hibernate will manage the schema (`create-drop`).
-    - Flyway is disabled.
-    - Inside VM Options for application configuration add:
-
-    ```bash
-        -Duser.timezone=Asia/Kolkata
-    ```
-
-5.  **Run Production**:
-    ```bash
-    mvn spring-boot:run -Dspring-boot.run.profiles=prod
-    ```
-    - In `prod` profile, Flyway handles migrations.
-    - Hibernate DDL is disabled.
-
-## API Endpoints
-
-### Health Check
+### 1. Environment Variables
+Copy `.env.example` to `.env` and configure your local settings:
 ```bash
-curl -X GET http://localhost:8080/api/v1/health
+cp .env.example .env
 ```
 
-### Registration
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/register \
--H "Content-Type: application/json" \
--d '{
-  "email": "admin@mandipro.com",
-  "password": "Password123",
-  "fullName": "System Admin",
-  "roles": ["ROLE_ADMIN"]
-}'
+### 2. Database Setup
+Ensure PostgreSQL is running and create the database:
+```sql
+CREATE DATABASE mandipro;
 ```
 
-### Login
+### 3. JVM Configuration
+For consistent timestamp handling, add the following to your IDE's VM Options:
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
--H "Content-Type: application/json" \
--d '{
-  "email": "admin@mandipro.com",
-  "password": "Password123"
-}'
+-Duser.timezone=Asia/Kolkata
 ```
 
-## Adding a New Entity
+### 4. Build & Run
+```bash
+# Build the project
+mvn clean install
 
-1.  Create the entity in `com.buildgrid.mandipro.entity` extending `BaseEntity`.
-2.  Create a Repository interface in `com.buildgrid.mandipro.repository`.
-3.  Create DTOs in `com.buildgrid.mandipro.dto`.
-4.  Add a mapping in `UserMapper` or create a new mapper.
-5.  **Migration (Prod)**: Create a new SQL file in `src/main/resources/db/migration` (e.g., `V4__add_products_table.sql`).
-    ```sql
-    CREATE TABLE products (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        name VARCHAR(255) NOT NULL,
-        price NUMERIC(10,2),
-        created_at TIMESTAMP NOT NULL DEFAULT now(),
-        updated_at TIMESTAMP,
-        created_by VARCHAR(255),
-        updated_by VARCHAR(255)
-    );
-    ```
+# Run in Development mode (Flyway enabled)
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
 
-## Swagger Documentation
-Available at: `http://localhost:8080/swagger-ui/index.html` (when `SWAGGER_ENABLED=true`)
+---
+
+## 🛤 API Endpoints
+
+### 🟢 Health Check
+*   **GET** `/api/v1/health`
+*   Returns system status, version, and trace ID.
+
+### 🔐 Authentication
+*   **POST** `/api/v1/auth/register` - Create a new account.
+*   **POST** `/api/v1/auth/login` - Get Access/Refresh tokens.
+
+---
+
+## 🏗 Development Workflow
+
+### Adding a New Entity
+1.  **Entity**: Create class in `entity/` extending `BaseEntity`.
+2.  **Repository**: Create interface in `repository/`.
+3.  **DTO**: Define request/response in `dto/`.
+4.  **Mapper**: Add mapping in `UserMapper` or new mapper.
+5.  **Migration**: Create a new SQL file in `src/main/resources/db/migration/` (e.g., `V4__create_new_table.sql`).
+
+---
+
+## 🔍 Observability
+*   **Trace ID**: Every request returns `X-Trace-Id` in the header.
+*   **Logging**: MDC logs include the `traceId` for easy debugging.
+*   **Swagger**: `http://localhost:8080/swagger-ui/index.html`
+
+---
+
+## 📑 Document Control
+
+| Version | Date | Change Points | Changed By | Branch Name |
+| :--- | :--- | :--- | :--- | :--- |
+| **1.0.0** | 2025-01-20 | Initial Framework Generation: Security, JWT, JPA, Postgres | Atharva Sugandhi | `backend/feature/framework` |
+| **1.1.0** | 2025-01-20 | Enabled Flyway in all Envs, `@SuperBuilder` fixes, `ddl-auto=validate` | Atharva Sugandhi | `backend/feature/flyway` |
+| **1.1.1** | 2025-01-20 | Updated User ROLES from multiple selection to single selection | Atharva Sugandhi | `backend/feature/flyway` |
