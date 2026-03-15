@@ -1,8 +1,10 @@
 package com.buildgrid.mandipro.security;
 
 import com.buildgrid.mandipro.constants.AppConstants;
+import com.buildgrid.mandipro.util.CookieUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -51,6 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
+        Optional<Cookie> cookie = CookieUtils.getCookie(request, AppConstants.ACCESS_TOKEN_COOKIE_NAME);
+        if (cookie.isPresent()) {
+            return cookie.get().getValue();
+        }
+
         String bearerToken = request.getHeader(AppConstants.HEADER_AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(AppConstants.BEARER_PREFIX)) {
             return bearerToken.substring(7);

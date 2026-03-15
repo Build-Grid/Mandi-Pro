@@ -13,4 +13,6 @@ public final class AppConstants {
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String DATE_FORMAT_DEFAULT = "yyyy-MM-dd";
     public static final String DATETIME_FORMAT_DEFAULT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 }

@@ -1,5 +1,6 @@
 package com.buildgrid.mandipro.entity;
 
+import com.buildgrid.mandipro.constants.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,11 +21,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @SuperBuilder
 public abstract class BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
-    private UUID id;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -42,4 +37,8 @@ public abstract class BaseEntity {
     @LastModifiedBy
     @Column(insertable = false)
     private String updatedBy;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.ACTIVE;
 }
