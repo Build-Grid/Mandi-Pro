@@ -1,16 +1,25 @@
 package com.buildgrid.mandipro.controller;
 
 import com.buildgrid.mandipro.constants.ApiPaths;
+import com.buildgrid.mandipro.constants.AppConstants;
 import com.buildgrid.mandipro.dto.request.LoginRequest;
+import com.buildgrid.mandipro.dto.request.RefreshTokenRequest;
 import com.buildgrid.mandipro.dto.request.RegisterRequest;
 import com.buildgrid.mandipro.dto.response.LoginResponse;
 import com.buildgrid.mandipro.dto.response.UserResponse;
+import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.payload.ApiResponse;
 import com.buildgrid.mandipro.service.AuthService;
+import com.buildgrid.mandipro.util.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,10 +34,20 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Value("${JWT_ACCESS_EXPIRY_MS}")
+    private long jwtAccessExpiryMs;
+
+    @Value("${JWT_REFRESH_EXPIRY_MS}")
+    private long jwtRefreshExpiryMs;
+
     @Operation(summary = "Authenticate user and receive access & refresh tokens")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         LoginResponse loginResponse = authService.login(loginRequest);
+
+        CookieUtils.addCookie(response, AppConstants.ACCESS_TOKEN_COOKIE_NAME, loginResponse.getAccessToken(), jwtAccessExpiryMs / 1000);
+        CookieUtils.addCookie(response, AppConstants.REFRESH_TOKEN_COOKIE_NAME, loginResponse.getRefreshToken(), jwtRefreshExpiryMs / 1000);
+
         return ResponseEntity.ok(ApiResponse.ok("Login successful", loginResponse));
     }
 
@@ -37,5 +56,20 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         UserResponse userResponse = authService.register(registerRequest);
         return ResponseEntity.ok(ApiResponse.created(userResponse));
+    }
+
+    @Operation(summary = "Refresh access token using refresh token")
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.getCookie(request, AppConstants.REFRESH_TOKEN_COOKIE_NAME)
+                .map(Cookie::getValue)
+                .orElseThrow(() -> new AppException("Refresh token cookie not found", HttpStatus.BAD_REQUEST));
+
+        LoginResponse loginResponse = authService.refreshToken(new RefreshTokenRequest(refreshToken));
+
+        CookieUtils.addCookie(response, AppConstants.ACCESS_TOKEN_COOKIE_NAME, loginResponse.getAccessToken(), jwtAccessExpiryMs / 1000);
+        CookieUtils.addCookie(response, AppConstants.REFRESH_TOKEN_COOKIE_NAME, loginResponse.getRefreshToken(), jwtRefreshExpiryMs / 1000);
+
+        return ResponseEntity.ok(ApiResponse.ok("Token refreshed successfully", loginResponse));
     }
 }

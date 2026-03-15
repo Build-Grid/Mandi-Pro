@@ -13,18 +13,29 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class User extends BaseEntity {
 
-    @Column(unique = true, nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Integer id;
+
+    @Column(name = "user_name", unique = true, nullable = false)
+    private String username;
+
+    @Column(name = "user_firstname", nullable = false)
+    private String firstName;
+
+    @Column(name = "user_lastname", nullable = false)
+    private String lastName;
+
+    @Column(name = "user_email", unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "user_password", nullable = false)
     private String password;
 
-    @Column(name = "full_name")
-    private String fullName;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean enabled = true;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "firm_id")
+    private Firm firm;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)

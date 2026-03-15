@@ -27,7 +27,17 @@ cp .env.example .env
 ### 2. Database Setup
 Ensure PostgreSQL is running and create the database:
 ```sql
-CREATE DATABASE mandipro;
+CREATE DATABASE mandipro-db;
+```
+OR
+```bash
+docker run -d \
+  --name mandipro-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_DB=mandipro-db \
+  -p 5432:5432 \
+  postgres:latest
 ```
 
 ### 3. JVM Configuration
@@ -76,11 +86,3 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 *   **Swagger**: `http://localhost:8080/swagger-ui/index.html`
 
 ---
-
-## 📑 Document Control
-
-| Version | Date | Change Points | Changed By | Branch Name |
-| :--- | :--- | :--- | :--- | :--- |
-| **1.0.0** | 2025-01-20 | Initial Framework Generation: Security, JWT, JPA, Postgres | Atharva Sugandhi | `backend/feature/framework` |
-| **1.1.0** | 2025-01-20 | Enabled Flyway in all Envs, `@SuperBuilder` fixes, `ddl-auto=validate` | Atharva Sugandhi | `backend/feature/flyway` |
-| **1.1.1** | 2025-01-20 | Updated User ROLES from multiple selection to single selection | Atharva Sugandhi | `backend/feature/flyway` |

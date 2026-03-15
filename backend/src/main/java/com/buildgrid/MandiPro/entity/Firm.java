@@ -7,20 +7,17 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
+@Table(name = "firms")
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Role extends BaseEntity {
+public class Firm extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
+    @Column(name = "firm_id")
     private Integer id;
 
-    @Column(name = "role_name", unique = true, nullable = false, length = 50)
+    @Column(name = "firm_name", nullable = false)
     private String name;
-
-    @Column(name = "role_description", length = 255)
-    private String description;
 }
