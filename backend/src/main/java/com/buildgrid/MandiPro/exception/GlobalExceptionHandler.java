@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleMessageNotReadableException(HttpMessageNotReadableException ex) {
         logException(ex);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request" + ex.getMessage());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

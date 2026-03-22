@@ -2,6 +2,7 @@ package com.buildgrid.mandipro.entity;
 
 import com.buildgrid.mandipro.constants.Status;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,22 +24,23 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(insertable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @CreatedBy
-    @Column(updatable = false)
+    @Column(name = "created_by", updatable = false)
     private String createdBy;
 
     @LastModifiedBy
-    @Column(insertable = false)
+    @Column(name = "updated_by")
     private String updatedBy;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Status status = Status.ACTIVE;
 }

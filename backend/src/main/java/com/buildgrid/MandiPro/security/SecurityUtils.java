@@ -1,7 +1,9 @@
 package com.buildgrid.mandipro.security;
 
 import com.buildgrid.mandipro.constants.RoleConstants;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ public final class SecurityUtils {
     public static Optional<String> getCurrentUserEmail() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(securityContext.getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken))
                 .map(authentication -> {
                     if (authentication.getPrincipal() instanceof UserDetails userDetails) {
                         return userDetails.getUsername();
@@ -30,7 +34,7 @@ public final class SecurityUtils {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) return Set.of();
         return authentication.getAuthorities().stream()
-                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
     }
 

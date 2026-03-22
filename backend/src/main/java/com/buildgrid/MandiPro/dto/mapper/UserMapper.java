@@ -1,5 +1,6 @@
 package com.buildgrid.mandipro.dto.mapper;
 
+import com.buildgrid.mandipro.dto.request.RegisterFirmRequest;
 import com.buildgrid.mandipro.dto.request.RegisterRequest;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.entity.User;
@@ -21,6 +22,12 @@ public interface UserMapper {
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "firm", ignore = true)
     User toEntity(RegisterRequest request);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "firm", ignore = true)
+    User toEntity(RegisterFirmRequest request);
 
     List<UserResponse> toResponseList(List<User> users);
 }

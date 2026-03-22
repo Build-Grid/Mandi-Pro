@@ -1,7 +1,9 @@
 package com.buildgrid.mandipro.security;
 
 import com.buildgrid.mandipro.constants.AppConstants;
+import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.util.CookieUtils;
+import com.buildgrid.mandipro.util.TraceIdUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -38,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 String username = tokenProvider.getUsernameFromToken(jwt);
+                log.info(LogMessages.TOKEN_VALIDATED, username, TraceIdUtil.get());
 
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

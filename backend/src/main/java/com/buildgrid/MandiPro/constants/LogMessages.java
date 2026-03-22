@@ -3,6 +3,7 @@ package com.buildgrid.mandipro.constants;
 public final class LogMessages {
     private LogMessages() {}
 
+    public static final String FIRM_REGISTERED = "Firm registered: {} | traceId: {}";
     public static final String USER_REGISTERED = "User registered: {} | traceId: {}";
     public static final String USER_LOGIN_SUCCESS = "Login successful: {} | traceId: {}";
     public static final String USER_LOGIN_FAILED = "Login failed for: {} | traceId: {}";
