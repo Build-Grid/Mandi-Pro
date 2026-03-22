@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FirmRepository extends JpaRepository<Firm, Integer> {
+public interface FirmRepository extends JpaRepository<Firm, Long> {
     Optional<Firm> findByName(String name);
 }
