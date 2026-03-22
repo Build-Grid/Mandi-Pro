@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS roles (
     role_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(50) NOT NULL UNIQUE,
-    role_description VARCHAR(255),
+    description VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(255),
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS roles (
 );
 
 -- Insert Roles (idempotent - use INSERT IGNORE for MySQL)
-INSERT IGNORE INTO roles (role_name, role_description, created_by, updated_by, status, created_at, updated_at) VALUES
+INSERT IGNORE INTO roles (role_name, description, created_by, updated_by, status, created_at, updated_at) VALUES
 ('ADMIN', 'Administrator role', 'SYSTEM', 'SYSTEM', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('OWNER', 'Owner role', 'SYSTEM', 'SYSTEM', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('MANAGER', 'Manager role', 'SYSTEM', 'SYSTEM', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -31,11 +31,11 @@ CREATE TABLE IF NOT EXISTS firms (
 -- Create Users table
 CREATE TABLE IF NOT EXISTS users (
     user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_name VARCHAR(255) NOT NULL UNIQUE,
-    user_firstname VARCHAR(255) NOT NULL,
-    user_lastname VARCHAR(255) NOT NULL,
-    user_email VARCHAR(255) NOT NULL UNIQUE,
-    user_password VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
     firm_id BIGINT,
     role_id BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

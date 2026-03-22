@@ -38,7 +38,7 @@ public final class SecurityUtils {
                 .collect(Collectors.toSet());
     }
 
-    public static boolean isAdmin() {
-        return getCurrentUserRoles().contains(RoleConstants.ADMIN);
+    public static boolean hasRole(RoleConstants role) {
+        return getCurrentUserRoles().contains("ROLE_" + role.name());
     }
 }

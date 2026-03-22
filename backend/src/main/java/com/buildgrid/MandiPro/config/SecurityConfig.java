@@ -1,6 +1,7 @@
 package com.buildgrid.mandipro.config;
 
 import com.buildgrid.mandipro.constants.ApiPaths;
+import com.buildgrid.mandipro.constants.RoleConstants;
 import com.buildgrid.mandipro.security.JwtAuthenticationFilter;
 import com.buildgrid.mandipro.security.CustomUserDetailsService;
 import com.buildgrid.mandipro.payload.ApiError;
@@ -39,6 +40,13 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
 
+    private static final String[] SWAGGER_WHITELIST = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**"
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -64,10 +72,27 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable) // Managed by CorsConfig.java
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ApiPaths.AUTH + "/**").permitAll()
-                        .requestMatchers(ApiPaths.HEALTH).permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
+
+                        // Public
+                        .requestMatchers(
+                                ApiPaths.AUTH + ApiPaths.AUTH_LOGIN,
+                                ApiPaths.AUTH + ApiPaths.AUTH_REGISTER,
+                                ApiPaths.AUTH + ApiPaths.AUTH_REFRESH,
+                                ApiPaths.HEALTH
+                        ).permitAll()
+
+                        // Swagger
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
+
+                        // Admin
+                        .requestMatchers(ApiPaths.ADMIN + "/**")
+                        .hasRole(RoleConstants.ADMIN.name())
+
+                        // Owner and Manager
+                        .requestMatchers(ApiPaths.FIRM + "/**")
+                        .hasAnyRole(RoleConstants.OWNER.name(), RoleConstants.MANAGER.name())
+
+                        // everything else
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
