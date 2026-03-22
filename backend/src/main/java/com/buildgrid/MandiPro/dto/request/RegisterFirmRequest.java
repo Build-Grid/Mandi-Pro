@@ -1,8 +1,5 @@
 package com.buildgrid.mandipro.dto.request;
 
-import com.buildgrid.mandipro.constants.RoleConstants;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,7 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class RegisterFirmRequest {
+
+    @NotBlank(message = "Firm name is required")
+    private String firmName;
 
     @NotBlank(message = "Username is required")
     private String username;
@@ -33,10 +33,4 @@ public class RegisterRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
-
-    @NotBlank(message = "Role is required")
-    private RoleConstants role;
-
-    @NotBlank(message = "Firm ID is required")
-    private Integer firmId;
 }

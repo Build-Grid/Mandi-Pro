@@ -18,7 +18,7 @@ public class RefreshToken extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @ToString.Include
-    private Integer id;
+    private Long id;
 
     @Column(name = "token", unique = true, nullable = false)
     @ToString.Include
