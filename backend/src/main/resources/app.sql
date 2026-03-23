@@ -1,6 +1,4 @@
--- Native SQL queries used by Spring Data JPA (bound via META-INF/orm.xml)
+# Custom native SQL queries for MandiPro
+# Format: key=SQL (key is used as the query identifier at runtime)
 
--- PasswordResetToken.deleteExpiredOrUsedByUser_Id
-DELETE FROM password_reset_tokens
-WHERE user_id = :userId
-  AND (expires_at < :now OR used = TRUE);
+deleteExpiredOrUsedPasswordResetTokensByUserId=DELETE FROM password_reset_tokens WHERE user_id = :userId AND (expires_at < :now OR used = TRUE)
