@@ -3,7 +3,7 @@ package com.buildgrid.mandipro.repository;
 import com.buildgrid.mandipro.entity.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -14,6 +14,5 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
     Optional<PasswordResetToken> findByToken(String token);
 
     @Modifying
-    @Query("DELETE FROM PasswordResetToken t WHERE t.user.id = :userId AND (t.expiresAt < :now OR t.used = true)")
-    void deleteExpiredOrUsedByUser_Id(Long userId, LocalDateTime now);
+    void deleteExpiredOrUsedByUser_Id(@Param("userId") Long userId, @Param("now") LocalDateTime now);
 }
