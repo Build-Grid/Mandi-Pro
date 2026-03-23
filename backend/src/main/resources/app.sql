@@ -1,4 +1,6 @@
-# Named JPQL queries for Spring Data JPA repositories
-# Format: EntityName.methodName=JPQL query
+-- Native SQL queries used by Spring Data JPA (bound via META-INF/orm.xml)
 
-PasswordResetToken.deleteExpiredOrUsedByUser_Id=DELETE FROM PasswordResetToken t WHERE t.user.id = :userId AND (t.expiresAt < :now OR t.used = true)
+-- PasswordResetToken.deleteExpiredOrUsedByUser_Id
+DELETE FROM password_reset_tokens
+WHERE user_id = :userId
+  AND (expires_at < :now OR used = TRUE);
