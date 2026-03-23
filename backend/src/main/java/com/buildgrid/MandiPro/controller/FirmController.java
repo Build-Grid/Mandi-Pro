@@ -1,7 +1,7 @@
 package com.buildgrid.mandipro.controller;
 
 import com.buildgrid.mandipro.constants.ApiPaths;
-import com.buildgrid.mandipro.dto.request.CreateFirmUserRequest;
+import com.buildgrid.mandipro.dto.request.RegisterRequest;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.payload.ApiResponse;
 import com.buildgrid.mandipro.service.FirmUserService;
@@ -26,7 +26,7 @@ public class FirmController {
 
     @Operation(summary = "Create a new firm user with role EMPLOYEE or MANAGER")
     @PostMapping(ApiPaths.FIRM_USERS)
-    public ResponseEntity<ApiResponse<UserResponse>> createFirmUser(@Valid @RequestBody CreateFirmUserRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> createFirmUser(@Valid @RequestBody RegisterRequest request) {
         UserResponse userResponse = firmUserService.createFirmUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.of(HttpStatus.CREATED, "User created successfully", userResponse));

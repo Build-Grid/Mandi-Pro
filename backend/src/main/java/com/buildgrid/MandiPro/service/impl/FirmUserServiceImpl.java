@@ -3,7 +3,7 @@ package com.buildgrid.mandipro.service.impl;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.constants.RoleConstants;
 import com.buildgrid.mandipro.dto.mapper.UserMapper;
-import com.buildgrid.mandipro.dto.request.CreateFirmUserRequest;
+import com.buildgrid.mandipro.dto.request.RegisterRequest;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.entity.Firm;
 import com.buildgrid.mandipro.entity.User;
@@ -34,7 +34,7 @@ public class FirmUserServiceImpl implements FirmUserService {
 
     @Override
     @Transactional
-    public UserResponse createFirmUser(CreateFirmUserRequest request) {
+    public UserResponse createFirmUser(RegisterRequest request) {
         String currentUserEmail = SecurityUtils.getCurrentUserEmail()
                 .orElseThrow(() -> new AppException("Not authenticated", HttpStatus.UNAUTHORIZED));
 
@@ -48,33 +48,32 @@ public class FirmUserServiceImpl implements FirmUserService {
 
         validateRole(request.getRole());
 
+        sanitize(request);
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException("Email already in use", HttpStatus.CONFLICT);
         }
 
-        String username = StringUtils.trimToNull(request.getUsername());
-        if (username == null) {
-            throw new AppException("Username must not be blank", HttpStatus.BAD_REQUEST);
-        }
-        if (userRepository.existsByUsernameAndFirm_Id(username, firm.getId())) {
+        if (userRepository.existsByUsernameAndFirm_Id(request.getUsername(), firm.getId())) {
             throw new AppException("Username already in use within this firm", HttpStatus.CONFLICT);
         }
 
-        User user = User.builder()
-                .username(username)
-                .firstName(StringUtils.trimToNull(request.getFirstName()))
-                .lastName(StringUtils.trimToNull(request.getLastName()))
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firm(firm)
-                .role(roleRepository.findByName(request.getRole().name())
-                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRole())))
-                .build();
+        User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFirm(firm);
+        user.setRole(roleRepository.findByName(request.getRole().name())
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRole())));
 
         User savedUser = userRepository.save(user);
         log.info(LogMessages.FIRM_USER_CREATED, savedUser.getEmail(), firm.getId(), TraceIdUtil.get());
 
         return userMapper.toResponse(savedUser);
+    }
+
+    private void sanitize(RegisterRequest request) {
+        request.setUsername(StringUtils.trimToNull(request.getUsername()));
+        request.setFirstName(StringUtils.trimToNull(request.getFirstName()));
+        request.setLastName(StringUtils.trimToNull(request.getLastName()));
     }
 
     private void validateRole(RoleConstants role) {
@@ -83,3 +82,4 @@ public class FirmUserServiceImpl implements FirmUserService {
         }
     }
 }
+
