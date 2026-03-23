@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
+                     https://jakarta.ee/xml/ns/persistence/orm/orm_3_0.xsd"
+                 version="3.0">
+
+    <!--
+        Native SQL queries for PasswordResetToken.
+        Canonical SQL is maintained in resources/app.sql.
+    -->
+    <named-native-query name="PasswordResetToken.deleteExpiredOrUsedByUser_Id">
+        <query>
+            DELETE FROM password_reset_tokens
+            WHERE user_id = :userId
+              AND (expires_at &lt; :now OR used = TRUE)
+        </query>
+    </named-native-query>
+
+</entity-mappings>
