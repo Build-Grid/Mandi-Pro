@@ -4,6 +4,7 @@ import com.buildgrid.mandipro.entity.PasswordResetToken;
 import com.buildgrid.mandipro.entity.User;
 import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.repository.PasswordResetTokenRepository;
+import com.buildgrid.mandipro.util.AppSqlLoader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -11,20 +12,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PasswordResetService {
 
+    private static final String DELETE_EXPIRED_OR_USED_KEY =
+            "deleteExpiredOrUsedPasswordResetTokensByUserId";
+
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AppSqlLoader appSqlLoader;
 
     @Value("${app.password-reset.expiry-minutes:15}")
     private int expiryMinutes;
 
     @Transactional
     public String createToken(User user) {
-        passwordResetTokenRepository.deleteExpiredOrUsedByUser_Id(user.getId(), LocalDateTime.now());
+        appSqlLoader.createNativeQuery(
+                DELETE_EXPIRED_OR_USED_KEY,
+                Map.of("userId", user.getId(), "now", LocalDateTime.now())
+        ).executeUpdate();
 
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = PasswordResetToken.builder()
