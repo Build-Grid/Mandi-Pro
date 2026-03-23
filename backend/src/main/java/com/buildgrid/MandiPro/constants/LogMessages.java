@@ -10,5 +10,6 @@ public final class LogMessages {
     public static final String TOKEN_VALIDATED = "Token validated for: {} | traceId: {}";
     public static final String EXCEPTION_CAUGHT = "Exception [{}]: {} | traceId: {}";
     public static final String REQUEST_RECEIVED = "Request: {} {} | IP: {} | traceId: {}";
+    public static final String FIRM_USER_CREATED = "Firm user created: {} | firmId: {} | traceId: {}";
     public static final String APP_STARTED = "MandiPro started | profile: {} | port: {} | version: {}";
 }

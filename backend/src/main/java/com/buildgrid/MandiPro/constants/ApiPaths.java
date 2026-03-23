@@ -12,4 +12,5 @@ public final class ApiPaths {
     public static final String HEALTH = BASE + "/health";
     public static final String ADMIN = BASE + "/admin";
     public static final String FIRM = BASE + "/firm";
+    public static final String FIRM_USERS = "/users";
 }
