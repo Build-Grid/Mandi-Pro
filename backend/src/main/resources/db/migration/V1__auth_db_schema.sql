@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS firms (
 -- Create Users table
 CREATE TABLE IF NOT EXISTS users (
     user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     firm_id BIGINT,
@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_by VARCHAR(255),
     updated_by VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    CONSTRAINT uk_users_firm_username UNIQUE (firm_id, username),
     FOREIGN KEY (firm_id) REFERENCES firms(firm_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );

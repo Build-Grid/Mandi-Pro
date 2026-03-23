@@ -15,6 +15,7 @@ import com.buildgrid.mandipro.repository.UserRepository;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,15 @@ public class FirmRegistrationService {
     private final FirmRepository firmRepository;
 
     public void registerFirmWithOwner(RegisterFirmRequest registerFirmRequest) {
-        validateUniqueness(registerFirmRequest);
+        sanitize(registerFirmRequest);
+
+        validateEmailUniqueness(registerFirmRequest);
 
         Firm firm = firmMapper.toEntity(registerFirmRequest);
         firm = firmRepository.save(firm);
         log.info(LogMessages.FIRM_REGISTERED, firm.getName(), TraceIdUtil.get());
+
+        validateUsernameUniquenessWithinFirm(registerFirmRequest.getUsername(), firm.getId());
 
         User user = userMapper.toEntity(registerFirmRequest);
         user.setPassword(passwordEncoder.encode(registerFirmRequest.getPassword()));
@@ -48,11 +53,21 @@ public class FirmRegistrationService {
         log.info(LogMessages.USER_REGISTERED, savedUser.getEmail(), TraceIdUtil.get());
     }
 
-    private void validateUniqueness(RegisterFirmRequest registerFirmRequest) {
+    private void sanitize(RegisterFirmRequest request) {
+        request.setFirstName(StringUtils.trimToNull(request.getFirstName()));
+        request.setLastName(StringUtils.trimToNull(request.getLastName()));
+        request.setFirmName(StringUtils.trimToNull(request.getFirmName()));
+        request.setUsername(StringUtils.trimToNull(request.getUsername()));
+    }
+
+    private void validateEmailUniqueness(RegisterFirmRequest registerFirmRequest) {
         if (userRepository.existsByEmail(registerFirmRequest.getEmail())) {
             throw new AppException("Email already in use", HttpStatus.CONFLICT);
         }
-        if (userRepository.existsByUsername(registerFirmRequest.getUsername())) {
+    }
+
+    private void validateUsernameUniquenessWithinFirm(String username, Long firmId) {
+        if (userRepository.existsByUsernameAndFirm_Id(username, firmId)) {
             throw new AppException("Username already in use", HttpStatus.CONFLICT);
         }
     }
