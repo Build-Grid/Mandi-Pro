@@ -9,6 +9,8 @@ public final class ApiPaths {
     public static final String AUTH_REGISTER = "/register";
     public static final String AUTH_REFRESH = "/refresh";
     public static final String AUTH_LOGOUT = "/logout";
+    public static final String AUTH_FORGOT_PASSWORD = "/forgot-password";
+    public static final String AUTH_RESET_PASSWORD = "/reset-password";
     public static final String HEALTH = BASE + "/health";
     public static final String ADMIN = BASE + "/admin";
     public static final String FIRM = BASE + "/firm";

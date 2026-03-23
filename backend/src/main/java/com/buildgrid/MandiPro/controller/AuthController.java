@@ -2,9 +2,11 @@ package com.buildgrid.mandipro.controller;
 
 import com.buildgrid.mandipro.constants.ApiPaths;
 import com.buildgrid.mandipro.constants.AppConstants;
+import com.buildgrid.mandipro.dto.request.ForgotPasswordRequest;
 import com.buildgrid.mandipro.dto.request.LoginRequest;
 import com.buildgrid.mandipro.dto.request.RefreshTokenRequest;
 import com.buildgrid.mandipro.dto.request.RegisterFirmRequest;
+import com.buildgrid.mandipro.dto.request.ResetPasswordRequest;
 import com.buildgrid.mandipro.dto.response.LoginResponse;
 import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.payload.ApiResponse;
@@ -25,8 +27,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.buildgrid.mandipro.constants.ApiPaths.AUTH_FORGOT_PASSWORD;
 import static com.buildgrid.mandipro.constants.ApiPaths.AUTH_LOGOUT;
 import static com.buildgrid.mandipro.constants.ApiPaths.AUTH_REFRESH;
+import static com.buildgrid.mandipro.constants.ApiPaths.AUTH_RESET_PASSWORD;
 
 @RestController
 @RequestMapping(ApiPaths.AUTH)
@@ -119,6 +123,20 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok("Logout successful", null));
     }
 
+    @Operation(summary = "Request a password reset link to be sent to the provided email")
+    @PostMapping(AUTH_FORGOT_PASSWORD)
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.ok("If the email is registered, a password reset link has been sent", null));
+    }
+
+    @Operation(summary = "Reset password using a valid reset token")
+    @PostMapping(AUTH_RESET_PASSWORD)
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.ok("Password has been reset successfully", null));
+    }
+
     private void setAuthCookies(HttpServletResponse response, LoginResponse loginResponse) {
         CookieUtils.addCookie(response, AppConstants.ACCESS_TOKEN_COOKIE_NAME, loginResponse.getAccessToken(),
                 jwtAccessExpiryMs / 1000, cookieHttpOnly, cookieSecure, cookieSameSite, cookieDomain, cookiePath);
@@ -126,3 +144,4 @@ public class AuthController {
                 jwtRefreshExpiryMs / 1000, cookieHttpOnly, cookieSecure, cookieSameSite, cookieDomain, cookiePath);
     }
 }
+

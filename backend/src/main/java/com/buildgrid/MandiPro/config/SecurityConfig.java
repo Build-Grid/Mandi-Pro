@@ -78,6 +78,8 @@ public class SecurityConfig {
                                 ApiPaths.AUTH + ApiPaths.AUTH_LOGIN,
                                 ApiPaths.AUTH + ApiPaths.AUTH_REGISTER,
                                 ApiPaths.AUTH + ApiPaths.AUTH_REFRESH,
+                                ApiPaths.AUTH + ApiPaths.AUTH_FORGOT_PASSWORD,
+                                ApiPaths.AUTH + ApiPaths.AUTH_RESET_PASSWORD,
                                 ApiPaths.HEALTH
                         ).permitAll()
 
