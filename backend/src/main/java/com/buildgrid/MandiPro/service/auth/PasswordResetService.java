@@ -1,5 +1,6 @@
 package com.buildgrid.mandipro.service.auth;
 
+import com.buildgrid.mandipro.constants.QueryNames;
 import com.buildgrid.mandipro.entity.PasswordResetToken;
 import com.buildgrid.mandipro.entity.User;
 import com.buildgrid.mandipro.exception.AppException;
@@ -19,9 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PasswordResetService {
 
-    private static final String DELETE_EXPIRED_OR_USED_KEY =
-            "deleteExpiredOrUsedPasswordResetTokensByUserId";
-
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final AppSqlLoader appSqlLoader;
 
@@ -31,7 +29,7 @@ public class PasswordResetService {
     @Transactional
     public String createToken(User user) {
         appSqlLoader.createNativeQuery(
-                DELETE_EXPIRED_OR_USED_KEY,
+                QueryNames.DELETE_EXPIRED_OR_USED_PASSWORD_RESET_TOKENS_BY_USER_ID,
                 Map.of("userId", user.getId(), "now", LocalDateTime.now())
         ).executeUpdate();
 
