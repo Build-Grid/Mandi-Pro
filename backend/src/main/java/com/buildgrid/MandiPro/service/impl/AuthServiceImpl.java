@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.password-reset.base-url:http://localhost:3000/reset-password}")
+    @Value("${app.password-reset.base-url:http://localhost:8080/reset-password}")
     private String passwordResetBaseUrl;
 
     @Override
