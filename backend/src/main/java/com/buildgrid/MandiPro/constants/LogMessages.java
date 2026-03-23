@@ -12,4 +12,6 @@ public final class LogMessages {
     public static final String REQUEST_RECEIVED = "Request: {} {} | IP: {} | traceId: {}";
     public static final String FIRM_USER_CREATED = "Firm user created: {} | firmId: {} | traceId: {}";
     public static final String APP_STARTED = "MandiPro started | profile: {} | port: {} | version: {}";
+    public static final String PASSWORD_RESET_REQUESTED = "Password reset requested for: {} | traceId: {}";
+    public static final String PASSWORD_RESET_SUCCESS = "Password reset successful for: {} | traceId: {}";
 }
