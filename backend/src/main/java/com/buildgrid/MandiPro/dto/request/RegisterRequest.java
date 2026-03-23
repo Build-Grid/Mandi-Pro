@@ -34,6 +34,5 @@ public class RegisterRequest {
     @NotNull(message = "Role is required")
     private RoleConstants role;
 
-    @NotNull(message = "Firm ID is required")
     private Long firmId;
 }
