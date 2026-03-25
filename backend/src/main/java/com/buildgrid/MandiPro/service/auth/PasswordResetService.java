@@ -1,5 +1,6 @@
 package com.buildgrid.mandipro.service.auth;
 
+import com.buildgrid.mandipro.config.PasswordResetConfig;
 import com.buildgrid.mandipro.constants.QueryNames;
 import com.buildgrid.mandipro.entity.PasswordResetToken;
 import com.buildgrid.mandipro.entity.User;
@@ -7,7 +8,6 @@ import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.repository.PasswordResetTokenRepository;
 import com.buildgrid.mandipro.util.AppSqlLoader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +22,7 @@ public class PasswordResetService {
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final AppSqlLoader appSqlLoader;
-
-    @Value("${app.password-reset.expiry-minutes:15}")
-    private int expiryMinutes;
+    private final PasswordResetConfig passwordResetConfig;
 
     @Transactional
     public String createToken(User user) {
@@ -37,15 +35,11 @@ public class PasswordResetService {
         PasswordResetToken resetToken = PasswordResetToken.builder()
                 .token(token)
                 .user(user)
-                .expiresAt(LocalDateTime.now().plusMinutes(expiryMinutes))
+                .expiresAt(LocalDateTime.now().plusMinutes(passwordResetConfig.getExpiryMinutes()))
                 .used(false)
                 .build();
         passwordResetTokenRepository.save(resetToken);
         return token;
-    }
-
-    public int getExpiryMinutes() {
-        return expiryMinutes;
     }
 
     public PasswordResetToken validateToken(String token) {
