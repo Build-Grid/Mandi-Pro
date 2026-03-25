@@ -1,5 +1,6 @@
 package com.buildgrid.mandipro.service.impl;
 
+import com.buildgrid.mandipro.config.PasswordResetConfig;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.dto.mapper.UserMapper;
 import com.buildgrid.mandipro.dto.request.ForgotPasswordRequest;
@@ -45,9 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordResetService passwordResetService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${app.password-reset.base-url:http://localhost:8080/reset-password}")
-    private String passwordResetBaseUrl;
+    private final PasswordResetConfig passwordResetConfig;
 
     @Override
     @Transactional
@@ -120,8 +119,8 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.findByEmail(request.getEmail()).ifPresent(user -> {
             String token = passwordResetService.createToken(user);
-            String resetLink = passwordResetBaseUrl + "?token=" + token;
-            emailService.sendPasswordResetEmail(user.getEmail(), resetLink, passwordResetService.getExpiryMinutes());
+            String resetLink = passwordResetConfig.getBaseUrl() + "?token=" + token;
+            emailService.sendPasswordResetEmail(user.getEmail(), resetLink, passwordResetConfig.getExpiryMinutes());
         });
     }
 

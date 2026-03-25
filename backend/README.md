@@ -35,7 +35,7 @@ MySQL database will be auto-created on startup. Ensure MySQL server is running:
 2. **Connect to your local MySQL instance** (default: `localhost:3306`)
 3. **Create database** if it doesn't exist manually in MySQL Workbench:
     ```sql
-    CREATE DATABASE mandipro-db;
+    CREATE DATABASE `mandipro-db`;
     ```
 4. **Verify connection** by executing a test query
 
@@ -159,7 +159,7 @@ All logs include the `traceId` in the MDC (Mapped Diagnostic Context) for easy c
 
 Access the interactive API documentation:
 
-- **URL**: `http://localhost:8080/swagger-ui.html`
+- **URL**: `http://localhost:8080/swagger-ui/index.html`
 - **OpenAPI JSON**: `http://localhost:8080/v3/api-docs`
 
 ### Health Check
