@@ -1,6 +1,5 @@
 package com.buildgrid.mandipro.exception;
 
-import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.payload.ApiError;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import jakarta.validation.ConstraintViolationException;
@@ -17,6 +16,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 @Slf4j
 @RestControllerAdvice
@@ -85,7 +87,54 @@ public class GlobalExceptionHandler {
     }
 
     private void logException(Exception ex) {
-        log.error(LogMessages.EXCEPTION_CAUGHT, ex.getClass().getSimpleName(), ex.getMessage(), TraceIdUtil.get());
+        String traceId = TraceIdUtil.get();
+        String exceptionTree = buildExceptionTree(ex);
+
+        log.error("""
+                Exception captured | traceId: %s
+                Type: %s
+                Message: %s
+                Cause tree:
+                %s
+                """.formatted(
+                traceId,
+                ex.getClass().getSimpleName(),
+                ex.getMessage(),
+                exceptionTree
+        ), ex);
+    }
+
+    private String buildExceptionTree(Throwable throwable) {
+        if (throwable == null) {
+            return "  - <none>";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        Throwable cursor = throwable;
+        int depth = 0;
+
+        while (cursor != null && visited.add(cursor)) {
+            String indent = "  ".repeat(depth);
+            String message = cursor.getMessage() == null ? "<no-message>" : cursor.getMessage();
+            builder.append(indent)
+                    .append("- ")
+                    .append(cursor.getClass().getSimpleName())
+                    .append(": ")
+                    .append(message)
+                    .append(System.lineSeparator());
+
+            cursor = cursor.getCause();
+            depth++;
+        }
+
+        if (cursor != null) {
+            builder.append("  ".repeat(depth))
+                    .append("- <cycle-detected>")
+                    .append(System.lineSeparator());
+        }
+
+        return builder.toString().trim();
     }
 
     private ResponseEntity<ApiError> buildErrorResponse(HttpStatus status, String message) {
