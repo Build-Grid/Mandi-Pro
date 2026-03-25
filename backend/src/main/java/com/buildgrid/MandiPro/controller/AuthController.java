@@ -2,15 +2,18 @@ package com.buildgrid.mandipro.controller;
 
 import com.buildgrid.mandipro.constants.ApiPaths;
 import com.buildgrid.mandipro.constants.AppConstants;
+import com.buildgrid.mandipro.dto.request.AcceptInviteRequest;
 import com.buildgrid.mandipro.dto.request.ForgotPasswordRequest;
 import com.buildgrid.mandipro.dto.request.LoginRequest;
 import com.buildgrid.mandipro.dto.request.RefreshTokenRequest;
 import com.buildgrid.mandipro.dto.request.RegisterFirmRequest;
 import com.buildgrid.mandipro.dto.request.ResetPasswordRequest;
 import com.buildgrid.mandipro.dto.response.LoginResponse;
+import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.payload.ApiResponse;
 import com.buildgrid.mandipro.service.AuthService;
+import com.buildgrid.mandipro.service.FirmInviteService;
 import com.buildgrid.mandipro.util.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,6 +42,7 @@ import static com.buildgrid.mandipro.constants.ApiPaths.AUTH_RESET_PASSWORD;
 public class AuthController {
 
     private final AuthService authService;
+    private final FirmInviteService firmInviteService;
 
     @Value("${JWT_ACCESS_EXPIRY_MS}")
     private long jwtAccessExpiryMs;
@@ -135,6 +139,14 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.ok("Password has been reset successfully", null));
+    }
+
+    @Operation(summary = "Accept a firm invitation and complete onboarding")
+    @PostMapping(ApiPaths.AUTH_ACCEPT_INVITE)
+    public ResponseEntity<ApiResponse<UserResponse>> acceptInvite(@Valid @RequestBody AcceptInviteRequest request) {
+        UserResponse userResponse = firmInviteService.acceptInvite(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(HttpStatus.CREATED, "Invitation accepted successfully", userResponse));
     }
 
     private void setAuthCookies(HttpServletResponse response, LoginResponse loginResponse) {

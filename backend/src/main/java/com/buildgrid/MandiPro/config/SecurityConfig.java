@@ -7,7 +7,6 @@ import com.buildgrid.mandipro.security.CustomUserDetailsService;
 import com.buildgrid.mandipro.payload.ApiError;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,6 +79,8 @@ public class SecurityConfig {
                                 ApiPaths.AUTH + ApiPaths.AUTH_REFRESH,
                                 ApiPaths.AUTH + ApiPaths.AUTH_FORGOT_PASSWORD,
                                 ApiPaths.AUTH + ApiPaths.AUTH_RESET_PASSWORD,
+                                ApiPaths.AUTH + ApiPaths.AUTH_ACCEPT_INVITE,
+                                ApiPaths.INVITES + ApiPaths.INVITES_PREVIEW,
                                 ApiPaths.HEALTH
                         ).permitAll()
 

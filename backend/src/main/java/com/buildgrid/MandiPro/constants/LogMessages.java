@@ -14,4 +14,9 @@ public final class LogMessages {
     public static final String APP_STARTED = "MandiPro started | profile: {} | port: {} | version: {}";
     public static final String PASSWORD_RESET_REQUESTED = "Password reset requested for: {} | traceId: {}";
     public static final String PASSWORD_RESET_SUCCESS = "Password reset successful for: {} | traceId: {}";
+
+    public static final String FIRM_INVITE_SENT = "Firm invite sent to: {} | firmId: {} | traceId: {}";
+    public static final String FIRM_INVITE_CANCELLED = "Firm invite cancelled: {} | firmId: {} | traceId: {}";
+    public static final String FIRM_INVITE_RESENT = "Firm invite resent: {} | firmId: {} | traceId: {}";
+    public static final String FIRM_INVITE_ACCEPTED = "Firm invite accepted by: {} | firmId: {} | traceId: {}";
 }

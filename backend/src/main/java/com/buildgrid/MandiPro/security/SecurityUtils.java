@@ -38,6 +38,26 @@ public final class SecurityUtils {
                 .collect(Collectors.toSet());
     }
 
+    public static Optional<String> getCurrentUsername() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable(securityContext.getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken))
+                .map(authentication -> {
+                    Object principal = authentication.getPrincipal();
+                    if (principal instanceof AuthenticatedUserPrincipal customPrincipal) {
+                        return customPrincipal.getBusinessUsername();
+                    }
+                    if (principal instanceof UserDetails userDetails) {
+                        return userDetails.getUsername();
+                    }
+                    if (principal instanceof String principalString) {
+                        return principalString;
+                    }
+                    return null;
+                });
+    }
+
     public static boolean hasRole(RoleConstants role) {
         return getCurrentUserRoles().contains("ROLE_" + role.name());
     }
