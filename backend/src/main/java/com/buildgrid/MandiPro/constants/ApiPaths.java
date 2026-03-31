@@ -12,10 +12,16 @@ public final class ApiPaths {
     public static final String AUTH_FORGOT_PASSWORD = "/forgot-password";
     public static final String AUTH_RESET_PASSWORD = "/reset-password";
     public static final String AUTH_ACCEPT_INVITE = "/accept-invite";
+    public static final String AUTH_ME_PROFILE = "/me/profile";
+    public static final String AUTH_ME_CHANGE_PASSWORD = "/me/change-password";
     public static final String HEALTH = BASE + "/health";
     public static final String ADMIN = BASE + "/admin";
     public static final String FIRM = BASE + "/firm";
     public static final String FIRM_USERS = "/users";
+    public static final String FIRM_USER = "/user/{userId}";
+    public static final String FIRM_USER_DELETE = "/user/{userId}/delete";
+    public static final String FIRM_PROFILE = "/profile";
+    public static final String FIRM_USER_ROLE = "/user/{userId}/role";
 
     public static final String FIRM_INVITES = "/invites";
     public static final String FIRM_INVITE_BY_ID = "/invites/{inviteId}";

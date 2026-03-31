@@ -1,6 +1,8 @@
 package com.buildgrid.mandipro.service.impl;
 
+import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.service.EmailService;
+import com.buildgrid.mandipro.util.TraceIdUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +38,9 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(buildHtmlBody(resetLink, expiryMinutes), true);
 
             mailSender.send(message);
-            log.info("Password reset email sent to: {}", to);
+            log.info(LogMessages.PASSWORD_RESET_EMAIL_SENT, to, TraceIdUtil.get());
         } catch (MessagingException e) {
-            log.error("Failed to send password reset email to: {}", to, e);
+            log.error(LogMessages.PASSWORD_RESET_EMAIL_FAILED, to, TraceIdUtil.get(), e);
             throw new RuntimeException("Failed to send password reset email", e);
         }
     }
@@ -61,9 +63,9 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(buildInviteHtmlBody(firmName, invitedRole, inviterName, inviteeEmail, expiresAt, acceptLink), true);
 
             mailSender.send(message);
-            log.info("Firm invite email sent to: {}", to);
+            log.info(LogMessages.FIRM_INVITE_EMAIL_SENT, to, TraceIdUtil.get());
         } catch (MessagingException e) {
-            log.error("Failed to send firm invite email to: {}", to, e);
+            log.error(LogMessages.FIRM_INVITE_EMAIL_FAILED, to, TraceIdUtil.get(), e);
             throw new RuntimeException("Failed to send firm invite email", e);
         }
     }

@@ -29,8 +29,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getEmail(),
                 user.getUsername(),
                 user.getPassword(),
-                user.getStatus() == Status.ACTIVE,
+                user.getStatus() == Status.ACTIVE && isFirmActive(user),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()))
         );
+    }
+
+    private boolean isFirmActive(User user) {
+        return user.getFirm() == null || user.getFirm().getStatus() == Status.ACTIVE;
     }
 }
