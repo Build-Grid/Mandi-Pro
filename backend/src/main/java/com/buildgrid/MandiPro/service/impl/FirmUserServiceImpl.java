@@ -1,14 +1,17 @@
 package com.buildgrid.mandipro.service.impl;
 
-import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.constants.RoleConstants;
+import com.buildgrid.mandipro.constants.LogMessages;
+import com.buildgrid.mandipro.constants.Status;
 import com.buildgrid.mandipro.dto.mapper.UserMapper;
-import com.buildgrid.mandipro.dto.request.RegisterRequest;
+import com.buildgrid.mandipro.dto.request.UpdateFirmProfileRequest;
+import com.buildgrid.mandipro.dto.request.UpdateUserRoleRequest;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.entity.Firm;
 import com.buildgrid.mandipro.entity.User;
 import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.exception.ResourceNotFoundException;
+import com.buildgrid.mandipro.repository.FirmRepository;
 import com.buildgrid.mandipro.repository.RoleRepository;
 import com.buildgrid.mandipro.repository.UserRepository;
 import com.buildgrid.mandipro.security.SecurityUtils;
@@ -18,67 +21,198 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FirmUserServiceImpl implements FirmUserService {
-
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final FirmRepository firmRepository;
+    private final RoleRepository roleRepository;
 
     @Override
-    @Transactional
-    public UserResponse createFirmUser(RegisterRequest request) {
-        String currentUserEmail = SecurityUtils.getCurrentUserEmail()
-                .orElseThrow(() -> new AppException("Not authenticated", HttpStatus.UNAUTHORIZED));
+    public List<UserResponse> fetchAllUsers() {
+        log.info(LogMessages.OPERATION_STARTED, "firm.fetchAllUsers", TraceIdUtil.get());
 
-        User currentUser = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+        User currentUser = getCurrentUserOrThrow();
+        Long firmId = getFirmIdOrThrow(currentUser);
+
+        List<User> userList = userRepository.findByFirm_Id(firmId)
+                .orElseThrow(() -> new ResourceNotFoundException("No users found for the firm"));
+
+        List<UserResponse> responses = userMapper.toResponseList(userList);
+        log.info(LogMessages.OPERATION_COMPLETED_WITH_COUNT, "firm.fetchAllUsers", responses.size(), TraceIdUtil.get());
+        return responses;
+    }
+
+    @Override
+    public void cancelUser(Long userId) {
+        log.info(LogMessages.OPERATION_STARTED, "firm.cancelUser", TraceIdUtil.get());
+
+        User user = fetchUserFromIdOrThrow(userId);
+        user.setStatus(Status.CANCEL);
+        userRepository.save(user);
+
+        log.info(LogMessages.OPERATION_COMPLETED, "firm.cancelUser", TraceIdUtil.get());
+    }
+
+    @Override
+    public void cancelFirm() {
+        log.info(LogMessages.OPERATION_STARTED, "firm.cancelFirm", TraceIdUtil.get());
+
+        User currentUser = getCurrentUserOrThrow();
+        Firm firm =  currentUser.getFirm();
+
+        if(!isOwner(currentUser)){
+            log.warn(LogMessages.OPERATION_FORBIDDEN, "firm.cancelFirm", currentUser.getEmail(), TraceIdUtil.get());
+            throw new AppException("Only the owner can cancel the firm", HttpStatus.FORBIDDEN);
+        }
+
+        firm.setStatus(Status.CANCEL);
+        firmRepository.save(firm);
+
+        log.info(LogMessages.OPERATION_COMPLETED, "firm.cancelFirm", TraceIdUtil.get());
+    }
+
+    @Override
+    public void updateFirmProfile(UpdateFirmProfileRequest request) {
+        log.info(LogMessages.OPERATION_STARTED, "firm.updateProfile", TraceIdUtil.get());
+
+        User currentUser = getCurrentUserOrThrow();
+        if (!isOwner(currentUser)) {
+            log.warn(LogMessages.OPERATION_FORBIDDEN, "firm.updateProfile", currentUser.getEmail(), TraceIdUtil.get());
+            throw new AppException("Only the owner can update firm profile", HttpStatus.FORBIDDEN);
+        }
+
+        String firmName = StringUtils.trimToNull(request.getFirmName());
+        if (firmName == null) {
+            throw new AppException("Firm name is required", HttpStatus.BAD_REQUEST);
+        }
 
         Firm firm = currentUser.getFirm();
-        if (firm == null) {
-            throw new AppException("Authenticated user is not associated with a firm", HttpStatus.FORBIDDEN);
+        assertFirmActive(firm, "firm.updateProfile");
+
+        firm.setName(firmName);
+        firmRepository.save(firm);
+
+        log.info(LogMessages.FIRM_PROFILE_UPDATED, firm.getId(), TraceIdUtil.get());
+        log.info(LogMessages.OPERATION_COMPLETED, "firm.updateProfile", TraceIdUtil.get());
+    }
+
+    @Override
+    public UserResponse updateUserRole(Long userId, UpdateUserRoleRequest request) {
+        log.info(LogMessages.OPERATION_STARTED, "firm.updateUserRole", TraceIdUtil.get());
+
+        User actor = getCurrentUserOrThrow();
+        validateOwnerManager(actor);
+
+        User targetUser = fetchUserFromIdOrThrow(userId);
+        if (targetUser.getId().equals(actor.getId())) {
+            throw new AppException("You cannot change your own role", HttpStatus.BAD_REQUEST);
         }
 
-        validateRole(request.getRole());
+        RoleConstants targetRole = request.getRole();
+        validatePromotableRole(targetRole);
 
-        sanitize(request);
+        RoleConstants currentRole = RoleConstants.valueOf(targetUser.getRole().getName());
+        validatePromotableRole(currentRole);
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new AppException("Email already in use", HttpStatus.CONFLICT);
+        if (currentRole == targetRole) {
+            throw new AppException("User already has this role", HttpStatus.BAD_REQUEST);
         }
 
-        if (userRepository.existsByUsernameAndFirm_Id(request.getUsername(), firm.getId())) {
-            throw new AppException("Username already in use within this firm", HttpStatus.CONFLICT);
-        }
+        targetUser.setRole(roleRepository.findByName(targetRole.name())
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + targetRole.name())));
+        User savedUser = userRepository.save(targetUser);
 
-        User user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFirm(firm);
-        user.setRole(roleRepository.findByName(request.getRole().name())
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRole())));
-
-        User savedUser = userRepository.save(user);
-        log.info(LogMessages.FIRM_USER_CREATED, savedUser.getEmail(), firm.getId(), TraceIdUtil.get());
-
+        log.info(LogMessages.USER_ROLE_UPDATED, savedUser.getId(), targetRole.name(), TraceIdUtil.get());
+        log.info(LogMessages.OPERATION_COMPLETED, "firm.updateUserRole", TraceIdUtil.get());
         return userMapper.toResponse(savedUser);
     }
 
-    private void sanitize(RegisterRequest request) {
-        request.setUsername(StringUtils.trimToNull(request.getUsername()));
-        request.setFirstName(StringUtils.trimToNull(request.getFirstName()));
-        request.setLastName(StringUtils.trimToNull(request.getLastName()));
+    @Override
+    public UserResponse fetchUser(Long userId) {
+        log.info(LogMessages.OPERATION_STARTED, "firm.fetchUser", TraceIdUtil.get());
+
+        User user = fetchUserFromIdOrThrow(userId);
+        UserResponse response = userMapper.toResponse(user);
+
+        log.info(LogMessages.OPERATION_COMPLETED, "firm.fetchUser", TraceIdUtil.get());
+        return response;
     }
 
-    private void validateRole(RoleConstants role) {
-        if (role != RoleConstants.EMPLOYEE && role != RoleConstants.MANAGER) {
-            throw new AppException("Role must be EMPLOYEE or MANAGER", HttpStatus.BAD_REQUEST);
+    private boolean isOwner(User currentUser) {
+        return StringUtils.equals(currentUser.getRole().getName(),RoleConstants.OWNER.name());
+    }
+
+    private void validateOwnerManager(User user) {
+        RoleConstants role = RoleConstants.valueOf(user.getRole().getName());
+        if (role != RoleConstants.OWNER && role != RoleConstants.MANAGER) {
+            log.warn(LogMessages.OPERATION_FORBIDDEN, "firm.updateUserRole", user.getEmail(), TraceIdUtil.get());
+            throw new AppException("Only OWNER or MANAGER can update user role", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    private void validatePromotableRole(RoleConstants role) {
+        if (role != RoleConstants.MANAGER && role != RoleConstants.EMPLOYEE) {
+            throw new AppException("Only EMPLOYEE and MANAGER roles can be updated", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    private User fetchUserFromIdOrThrow(Long userId){
+        User currentUser = getCurrentUserOrThrow();
+        Long firmId = getFirmIdOrThrow(currentUser);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        if (!user.getFirm().getId().equals(firmId)) {
+            throw new AppException("User does not belong to the same firm", HttpStatus.FORBIDDEN);
+        }
+
+        assertFirmActive(user.getFirm(), "firm.fetchUserFromId");
+
+        return user;
+    }
+
+    private User getCurrentUserOrThrow() {
+        String email = SecurityUtils.getCurrentUserEmail()
+                .orElseThrow(() -> new AppException("Not authenticated", HttpStatus.UNAUTHORIZED));
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+
+        if (user.getFirm() != null) {
+            assertFirmActive(user.getFirm(), "firm.authenticatedAccess");
+        }
+
+        return user;
+    }
+
+    private Long getFirmIdOrThrow(User currentUser) {
+        Firm firm = currentUser.getFirm();
+        if(firm == null) {
+            throw new AppException("User not associated with any firm.", HttpStatus.FORBIDDEN);
+        }
+
+        assertFirmActive(firm, "firm.access");
+
+        return firm.getId();
+    }
+
+    private void assertFirmActive(Firm firm, String operationName) {
+        if (firm.getStatus() != Status.ACTIVE) {
+            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
+                    operationName,
+                    firm.getId(),
+                    firm.getStatus(),
+                    TraceIdUtil.get());
+            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
         }
     }
 }

@@ -4,6 +4,7 @@ import com.buildgrid.mandipro.config.InviteConfig;
 import com.buildgrid.mandipro.constants.InviteStatus;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.constants.RoleConstants;
+import com.buildgrid.mandipro.constants.Status;
 import com.buildgrid.mandipro.dto.mapper.FirmInviteMapper;
 import com.buildgrid.mandipro.dto.mapper.UserMapper;
 import com.buildgrid.mandipro.dto.request.AcceptInviteRequest;
@@ -54,6 +55,8 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     @Override
     @Transactional
     public FirmInviteResponse sendInvite(FirmInviteCreateRequest request) {
+        log.info(LogMessages.OPERATION_STARTED, "firmInvite.sendInvite", TraceIdUtil.get());
+
         User inviter = getCurrentUserOrThrow();
         validateOwnerManager(inviter);
         Long firmId = getFirmIdOrThrow(inviter);
@@ -71,25 +74,33 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         sendInviteEmail(saved);
 
         log.info(LogMessages.FIRM_INVITE_SENT, saved.getEmail(), saved.getFirm().getId(), TraceIdUtil.get());
+        log.info(LogMessages.OPERATION_COMPLETED, "firmInvite.sendInvite", TraceIdUtil.get());
         return buildInviteResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<FirmInviteResponse> listInvites() {
+        log.info(LogMessages.OPERATION_STARTED, "firmInvite.listInvites", TraceIdUtil.get());
+
         User currentUser = getCurrentUserOrThrow();
         validateOwnerManager(currentUser);
         Long firmId = getFirmIdOrThrow(currentUser);
 
-        return firmInviteRepository.findByFirm_IdOrderByCreatedAtDesc(firmId)
+        List<FirmInviteResponse> responses = firmInviteRepository.findByFirm_IdOrderByCreatedAtDesc(firmId)
                 .stream()
                 .map(this::buildInviteResponse)
                 .toList();
+
+        log.info(LogMessages.OPERATION_COMPLETED_WITH_COUNT, "firmInvite.listInvites", responses.size(), TraceIdUtil.get());
+        return responses;
     }
 
     @Override
     @Transactional
     public void cancelInvite(UUID inviteId) {
+        log.info(LogMessages.OPERATION_STARTED, "firmInvite.cancelInvite", TraceIdUtil.get());
+
         User currentUser = getCurrentUserOrThrow();
         validateOwnerManager(currentUser);
         Long firmId = getFirmIdOrThrow(currentUser);
@@ -102,11 +113,14 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         firmInviteRepository.save(invite);
 
         log.info(LogMessages.FIRM_INVITE_CANCELLED, invite.getId(), firmId, TraceIdUtil.get());
+        log.info(LogMessages.OPERATION_COMPLETED, "firmInvite.cancelInvite", TraceIdUtil.get());
     }
 
     @Override
     @Transactional
     public FirmInviteResponse resendInvite(UUID inviteId) {
+        log.info(LogMessages.OPERATION_STARTED, "firmInvite.resendInvite", TraceIdUtil.get());
+
         User currentUser = getCurrentUserOrThrow();
         validateOwnerManager(currentUser);
         Long firmId = getFirmIdOrThrow(currentUser);
@@ -122,6 +136,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         sendInviteEmail(saved);
 
         log.info(LogMessages.FIRM_INVITE_RESENT, saved.getId(), firmId, TraceIdUtil.get());
+        log.info(LogMessages.OPERATION_COMPLETED, "firmInvite.resendInvite", TraceIdUtil.get());
         return firmInviteMapper.toResponse(saved);
     }
 
@@ -129,18 +144,26 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     @Override
     @Transactional
     public InvitePreviewResponse previewInvite(String token) {
+        log.info(LogMessages.OPERATION_STARTED, "firmInvite.previewInvite", TraceIdUtil.get());
+
         FirmInvite invite = getByTokenOrThrow(token);
+        assertFirmActive(invite.getFirm(), "firmInvite.previewInvite");
         ensurePendingAndNotExpired(invite);
 
-        return firmInviteMapper.toPreviewResponse(invite);
+        InvitePreviewResponse response = firmInviteMapper.toPreviewResponse(invite);
+        log.info(LogMessages.OPERATION_COMPLETED, "firmInvite.previewInvite", TraceIdUtil.get());
+        return response;
     }
 
     @Override
     @Transactional
     public UserResponse acceptInvite(AcceptInviteRequest request) {
+        log.info(LogMessages.OPERATION_STARTED, "firmInvite.acceptInvite", TraceIdUtil.get());
+
         sanitizeAcceptInviteRequest(request);
 
         FirmInvite invite = getByTokenOrThrow(request.getToken());
+        assertFirmActive(invite.getFirm(), "firmInvite.acceptInvite");
         ensurePendingAndNotExpired(invite);
 
         if (userRepository.existsByEmail(invite.getEmail())) {
@@ -164,6 +187,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         firmInviteRepository.save(invite);
 
         log.info(LogMessages.FIRM_INVITE_ACCEPTED, invite.getEmail(), invite.getFirm().getId(), TraceIdUtil.get());
+        log.info(LogMessages.OPERATION_COMPLETED, "firmInvite.acceptInvite", TraceIdUtil.get());
         return userMapper.toResponse(savedUser);
     }
 
@@ -202,6 +226,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     private void validateOwnerManager(User user) {
         RoleConstants role = RoleConstants.valueOf(user.getRole().getName());
         if (role != RoleConstants.OWNER && role != RoleConstants.MANAGER) {
+            log.warn(LogMessages.OPERATION_FORBIDDEN, "firmInvite.manage", user.getEmail(), TraceIdUtil.get());
             throw new AppException("Only OWNER or MANAGER can manage invites", HttpStatus.FORBIDDEN);
         }
     }
@@ -211,6 +236,8 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         if (firm == null) {
             throw new AppException("Authenticated user is not associated with a firm", HttpStatus.FORBIDDEN);
         }
+
+        assertFirmActive(firm, "firmInvite.access");
         return firm.getId();
     }
 
@@ -241,8 +268,25 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         String email = SecurityUtils.getCurrentUserEmail()
                 .orElseThrow(() -> new AppException("Not authenticated", HttpStatus.UNAUTHORIZED));
 
-        return userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+
+        if (user.getFirm() != null) {
+            assertFirmActive(user.getFirm(), "firmInvite.authenticatedAccess");
+        }
+
+        return user;
+    }
+
+    private void assertFirmActive(Firm firm, String operationName) {
+        if (firm.getStatus() != Status.ACTIVE) {
+            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
+                    operationName,
+                    firm.getId(),
+                    firm.getStatus(),
+                    TraceIdUtil.get());
+            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
+        }
     }
 
 

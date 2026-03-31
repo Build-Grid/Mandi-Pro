@@ -1,5 +1,7 @@
 package com.buildgrid.mandipro.security;
 
+import com.buildgrid.mandipro.constants.LogMessages;
+import com.buildgrid.mandipro.util.TraceIdUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -81,7 +83,7 @@ public class JwtTokenProvider {
             Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
-            log.error("Invalid JWT token: {}", ex.getMessage());
+            log.error(LogMessages.JWT_TOKEN_INVALID, ex.getMessage(), TraceIdUtil.get());
         }
         return false;
     }
