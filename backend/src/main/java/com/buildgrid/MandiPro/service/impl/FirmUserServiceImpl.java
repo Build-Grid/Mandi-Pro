@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     private final RoleRepository roleRepository;
 
     @Override
+    @Transactional
     public List<UserResponse> fetchAllUsers() {
         log.info(LogMessages.OPERATION_STARTED, "firm.fetchAllUsers", TraceIdUtil.get());
 
@@ -50,6 +52,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     }
 
     @Override
+    @Transactional
     public void cancelUser(Long userId) {
         log.info(LogMessages.OPERATION_STARTED, "firm.cancelUser", TraceIdUtil.get());
 
@@ -61,6 +64,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     }
 
     @Override
+    @Transactional
     public void cancelFirm() {
         log.info(LogMessages.OPERATION_STARTED, "firm.cancelFirm", TraceIdUtil.get());
 
@@ -79,6 +83,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     }
 
     @Override
+    @Transactional
     public void updateFirmProfile(UpdateFirmProfileRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "firm.updateProfile", TraceIdUtil.get());
 
@@ -104,6 +109,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     }
 
     @Override
+    @Transactional
     public UserResponse updateUserRole(Long userId, UpdateUserRoleRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "firm.updateUserRole", TraceIdUtil.get());
 
@@ -135,6 +141,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     }
 
     @Override
+    @Transactional
     public UserResponse fetchUser(Long userId) {
         log.info(LogMessages.OPERATION_STARTED, "firm.fetchUser", TraceIdUtil.get());
 

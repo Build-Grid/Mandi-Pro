@@ -22,6 +22,7 @@ public final class ApiPaths {
     public static final String FIRM_USER_DELETE = "/user/{userId}/delete";
     public static final String FIRM_PROFILE = "/profile";
     public static final String FIRM_USER_ROLE = "/user/{userId}/role";
+    public static final String FIRM_DELETE = "/delete";
 
     public static final String FIRM_INVITES = "/invites";
     public static final String FIRM_INVITE_BY_ID = "/invites/{inviteId}";
