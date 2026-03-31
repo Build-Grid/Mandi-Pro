@@ -30,7 +30,7 @@ public class FirmController {
     private final FirmUserService firmUserService;
 
     @Operation(summary = "Fetch all users in the firm", description = "Returns a list of all users associated with the firm. Accessible by OWNER and MANAGER.")
-    @PostMapping(ApiPaths.FIRM_USERS)
+    @GetMapping(ApiPaths.FIRM_USERS)
     public ResponseEntity<ApiResponse<List<UserResponse>>> fetchAllUsersInFirm() {
         log.info(LogMessages.OPERATION_STARTED, "api.firm.fetchAllUsersInFirm", TraceIdUtil.get());
         List<UserResponse> fetchedUsers = firmUserService.fetchAllUsers();
@@ -40,7 +40,7 @@ public class FirmController {
     }
 
     @Operation(summary = "Fetch user details by user ID", description = "Returns details of a specific user in the firm by their user ID. Accessible by OWNER and MANAGER.")
-    @PostMapping(ApiPaths.FIRM_USER)
+    @GetMapping(ApiPaths.FIRM_USER)
     public ResponseEntity<ApiResponse<UserResponse>> findUserByUserId(@PathVariable Long userId) {
         log.info(LogMessages.OPERATION_STARTED, "api.firm.findUserByUserId", TraceIdUtil.get());
         UserResponse userResponse = firmUserService.fetchUser(userId);
@@ -76,5 +76,12 @@ public class FirmController {
         return ResponseEntity.ok(ok("User role updated successfully", response));
     }
 
-
+    @Operation(summary = "Deactivates the firm", description = "Change the status of the firm to CANCEL. Accessible only by OWNER.")
+    @DeleteMapping(ApiPaths.FIRM_DELETE)
+    public ResponseEntity<ApiResponse<Void>> cancelFirm() {
+        log.info(LogMessages.OPERATION_STARTED, "api.firm.cancelFirm", TraceIdUtil.get());
+        firmUserService.cancelFirm();
+        log.info(LogMessages.OPERATION_COMPLETED, "api.firm.cancelFirm", TraceIdUtil.get());
+        return ResponseEntity.ok(ok("Firm cancelled successfully", null));
+    }
 }
