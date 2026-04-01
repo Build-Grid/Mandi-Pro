@@ -4,5 +4,11 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+    resolve: {
+        dedupe: ["react", "react-dom", "react-redux"],
+    },
+    optimizeDeps: {
+        include: ["react", "react-dom", "react/jsx-runtime", "react-redux"],
+    },
+    plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 });

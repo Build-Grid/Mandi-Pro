@@ -1,0 +1,30 @@
+export const APP_ROUTES = {
+    landing: "/landing",
+    authRoot: "/auth",
+    authLogin: "/auth/login",
+    authRegister: "/auth/register",
+    home: "/",
+    firm: "/firm",
+    firmUser: "/firm/user",
+    firmInventory: "/firm/inventory",
+    trade: "/trade",
+    tbd: "/tbd",
+    profileUser: "/profile/user",
+    profileFirm: "/profile/firm",
+    profileUserChangePassword: "/profile/user/change-password",
+} as const;
+
+export const APP_ROUTE_SEGMENTS = {
+    landing: "landing",
+    authRoot: "auth",
+    authLogin: "login",
+    authRegister: "register",
+    firm: "firm",
+    firmUser: "firm/user",
+    firmInventory: "firm/inventory",
+    trade: "trade",
+    tbd: "tbd",
+    profileUser: "profile/user",
+    profileFirm: "profile/firm",
+    profileUserChangePassword: "profile/user/change-password",
+} as const;
