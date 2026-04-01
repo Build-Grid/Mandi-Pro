@@ -1,87 +1,124 @@
-# Welcome to React Router!
+# Mandi Pro Frontend
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Production-oriented React Router frontend for firm management and trade operations.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Stack
 
-## Features
+- React + React Router (file-config route tree)
+- TypeScript
+- Tailwind CSS
+- Axios (centralized API client)
+- Redux Toolkit + React Redux (global UI/application state)
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+## Route Map
 
-## Getting Started
+### Public
 
-### Installation
+- `/landing` -> Landing page with header and footer
+- `/auth/login` -> Login page
+- `/auth/register` -> Register firm and owner page
 
-Install the dependencies:
+### App Shell (Sidebar + Header)
+
+- `/` -> Home dashboard
+- `/FIRM` -> Firm management
+- `/FIRM/USER` -> Firm user management
+- `/FIRM/INVENTORY` -> Firm inventory
+- `/TRADE` -> Trade entry
+- `/TBD` -> Reserved feature route
+- `/PROFILE/USER` -> User profile
+- `/PROFILE/FIRM` -> Firm profile
+- `/PROFILE/USER/CHANGE-PASSWORD` -> Change password
+
+## Folder Structure
+
+```txt
+app/
+	api/
+		httpClient.ts
+	components/
+		common/
+		layout/
+	config/
+		env.ts
+	routes/
+		app-shell.tsx
+		landing.tsx
+		auth/
+		firm/
+		profile/
+	store/
+		index.ts
+		hooks.ts
+		slices/
+```
+
+## Environment Profiles (HTTP/HTTPS)
+
+This project supports protocol switching via profile-specific env files.
+
+### Development Profile
+
+File: `.env.development`
+
+```env
+VITE_APP_ENV=development
+VITE_API_PROTOCOL=http
+VITE_API_HOST=localhost
+VITE_API_PORT=3000
+VITE_API_BASE_PATH=/api
+```
+
+### Production Profile
+
+File: `.env.production`
+
+```env
+VITE_APP_ENV=production
+VITE_API_PROTOCOL=https
+VITE_API_HOST=api.mandi-pro.com
+VITE_API_PORT=443
+VITE_API_BASE_PATH=/api
+```
+
+`app/config/env.ts` builds the runtime API base URL from these variables.
+
+## Run Locally
+
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Development
-
-Start the development server with HMR:
+2. Start development server:
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+3. Open app:
 
-## Building for Production
+- `http://localhost:5173/landing` for public landing
+- `http://localhost:5173/` for app shell
 
-Create a production build:
+## Build and Serve
+
+1. Build:
 
 ```bash
 npm run build
 ```
 
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
+2. Start server build:
 
 ```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+npm run start
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
+## Notes For Future Development
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- Use `app/api/httpClient.ts` for all HTTP calls. Add feature-specific API modules under `app/api/`.
+- Keep route components thin. Move reusable logic to `components/`, `store/`, and dedicated service modules.
+- Replace placeholder page content with feature modules incrementally without changing route contracts.
+- If auth is introduced, implement route guards around app-shell routes and central token handling in Axios interceptors.
