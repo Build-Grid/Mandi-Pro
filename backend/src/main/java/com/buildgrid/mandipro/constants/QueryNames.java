@@ -5,4 +5,6 @@ public final class QueryNames {
 
     public static final String DELETE_EXPIRED_OR_USED_PASSWORD_RESET_TOKENS_BY_USER_ID =
             "deleteExpiredOrUsedPasswordResetTokensByUserId";
+
+    public static final String DELETE_FIRM_AND_RELATED_USERS =  "deleteFirmAndRelatedUsers";
 }

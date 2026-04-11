@@ -16,6 +16,7 @@ import com.buildgrid.mandipro.repository.RoleRepository;
 import com.buildgrid.mandipro.repository.UserRepository;
 import com.buildgrid.mandipro.security.SecurityUtils;
 import com.buildgrid.mandipro.service.FirmUserService;
+import com.buildgrid.mandipro.util.AppSqlLoader;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.buildgrid.mandipro.constants.QueryNames.DELETE_FIRM_AND_RELATED_USERS;
 
 @Slf4j
 @Service
@@ -34,6 +38,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     private final UserMapper userMapper;
     private final FirmRepository firmRepository;
     private final RoleRepository roleRepository;
+    private final AppSqlLoader appSqlLoader;
 
     @Override
     @Transactional
@@ -76,8 +81,10 @@ public class FirmUserServiceImpl implements FirmUserService {
             throw new AppException("Only the owner can cancel the firm", HttpStatus.FORBIDDEN);
         }
 
-        firm.setStatus(Status.CANCEL);
-        firmRepository.save(firm);
+        appSqlLoader.createNativeQuery(
+                DELETE_FIRM_AND_RELATED_USERS,
+                Map.of("firmId", firm.getId())
+        ).executeUpdate();
 
         log.info(LogMessages.OPERATION_COMPLETED, "firm.cancelFirm", TraceIdUtil.get());
     }
