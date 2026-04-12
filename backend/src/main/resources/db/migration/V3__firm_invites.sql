@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS firm_invites (
     id CHAR(36) PRIMARY KEY,
     firm_id BIGINT NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
     invited_by_user_id BIGINT NOT NULL,
@@ -14,8 +14,9 @@ CREATE TABLE IF NOT EXISTS firm_invites (
     created_by VARCHAR(255),
     updated_by VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    CONSTRAINT uk_firm_invites_firm_username UNIQUE (firm_id, username),
-    FOREIGN KEY (firm_id) REFERENCES firms(firm_id),
-    FOREIGN KEY (invited_by_user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_firm_invite_firms
+        FOREIGN KEY (firm_id) REFERENCES firms(firm_id),
+    CONSTRAINT fk_firm_invite_users
+        FOREIGN KEY (invited_by_user_id) REFERENCES users(user_id)
 );
 

@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) NOT NULL,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     firm_id BIGINT,
     role_id BIGINT NOT NULL,
@@ -43,9 +43,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_by VARCHAR(255),
     updated_by VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    CONSTRAINT uk_users_firm_username UNIQUE (firm_id, username),
-    FOREIGN KEY (firm_id) REFERENCES firms(firm_id),
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    CONSTRAINT fk_users_roles
+        FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
 -- Create Refresh Tokens table
@@ -58,5 +57,6 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     created_by VARCHAR(255),
     updated_by VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_refresh_tokens_users
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

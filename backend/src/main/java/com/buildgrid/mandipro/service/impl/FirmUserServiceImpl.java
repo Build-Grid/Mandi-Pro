@@ -59,6 +59,12 @@ public class FirmUserServiceImpl implements FirmUserService {
         log.info(LogMessages.OPERATION_STARTED, "firm.cancelUser", TraceIdUtil.get());
 
         User user = fetchUserFromIdOrThrow(userId);
+        if (user.getStatus() == Status.CANCEL) {
+            throw new AppException("User already cancelled", HttpStatus.BAD_REQUEST);
+        }
+        if (StringUtils.equals(user.getRole().getName(), RoleConstants.OWNER.name())) {
+            throw new AppException("Firm owner cannot be cancelled", HttpStatus.BAD_REQUEST);
+        }
         user.setStatus(Status.CANCEL);
         userRepository.save(user);
 
