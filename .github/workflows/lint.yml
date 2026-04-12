@@ -1,0 +1,58 @@
+name: 🔍 Lint & Code Quality
+
+on:
+    pull_request:
+        branches: [master]
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📥 Checkout
+              uses: actions/checkout@v4
+
+            # ---------------------------
+            # ⚛️ Frontend (React - ESLint)
+            # ---------------------------
+            - name: 🟢 Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "npm"
+
+            - name: 📦 Install Frontend Dependencies
+              run: |
+                  cd frontend
+                  npm ci
+
+            - name: 🔍 Run Frontend Lint (ESLint)
+              run: |
+                  cd frontend
+                  npm run lint
+
+            # ---------------------------
+            # ☕ Backend (Spring Boot - Java 21)
+            # ---------------------------
+            - name: ☕ Setup Java 21
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 21
+
+            - name: 📦 Cache Maven
+              uses: actions/cache@v4
+              with:
+                  path: ~/.m2
+                  key: ${{ runner.os }}-maven-${{ hashFiles('backend/pom.xml') }}
+
+            - name: 🔍 Run Checkstyle
+              run: |
+                  cd backend
+                  mvn checkstyle:check
+
+            # Optional (recommended for pro setup)
+            - name: 🐞 Run SpotBugs
+              run: |
+                  cd backend
+                  mvn com.github.spotbugs:spotbugs-maven-plugin:check

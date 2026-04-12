@@ -1,0 +1,47 @@
+name: 🔧 Improvement
+description: Suggest improvements or refactoring
+title: "[IMPROVEMENT] "
+labels: ["type: refactor"]
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              ## 🔧 Improvement Request
+
+    - type: textarea
+      id: current
+      attributes:
+          label: 📌 Current Behavior
+          description: What is the current situation?
+      validations:
+          required: true
+
+    - type: textarea
+      id: improvement
+      attributes:
+          label: 🚀 Proposed Improvement
+          description: What should be improved?
+      validations:
+          required: true
+
+    - type: dropdown
+      id: area
+      attributes:
+          label: 🧩 Area
+          options:
+              - Frontend
+              - Backend
+              - API
+              - Performance
+              - Code Quality
+              - DevOps
+
+    - type: dropdown
+      id: impact
+      attributes:
+          label: ⚡ Impact
+          options:
+              - Low
+              - Medium
+              - High

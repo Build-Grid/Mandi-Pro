@@ -1,0 +1,25 @@
+name: 🔐 CodeQL Security Scan
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    analyze:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: 🔍 Initialize CodeQL
+              uses: github/codeql-action/init@v3
+              with:
+                  languages: java, javascript
+
+            - name: 🏗 Build Backend
+              run: |
+                  cd backend
+                  mvn clean install -DskipTests
+
+            - name: 🔎 Analyze
+              uses: github/codeql-action/analyze@v3

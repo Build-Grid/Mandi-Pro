@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+
+contact_links:
+    - name: 💬 Ask a Question (Discussions)
+      url: https://github.com/Build-Grid/Mandi-Pro/discussions
+      about: Use Discussions for general questions, help, and ideas
+
+    - name: 📖 Documentation
+      url: https://github.com/Build-Grid/Mandi-Pro/wiki
+      about: Check the WIKI before opening an issue
+
+    - name: 🛠️ Support / Help
+      url: mailto:thebuildgrid@gmail.com
+      about: Contact maintainers directly for sensitive or urgent issues
