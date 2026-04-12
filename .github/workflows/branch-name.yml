@@ -3,6 +3,9 @@ name: 🌿 Branch Name Check
 on:
     pull_request:
 
+permissions:
+    contents: read
+
 jobs:
     branch-name:
         runs-on: ubuntu-latest
