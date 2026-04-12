@@ -89,6 +89,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
 
         List<FirmInviteResponse> responses = firmInviteRepository.findByFirm_IdOrderByCreatedAtDesc(firmId)
                 .stream()
+                .filter(invite -> invite.getStatus() == Status.ACTIVE)
                 .map(this::buildInviteResponse)
                 .toList();
 
@@ -184,6 +185,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
 
         invite.setInviteStatus(InviteStatus.ACCEPTED);
         invite.setToken(null);
+        invite.setStatus(Status.CANCEL);
         firmInviteRepository.save(invite);
 
         log.info(LogMessages.FIRM_INVITE_ACCEPTED, invite.getEmail(), invite.getFirm().getId(), TraceIdUtil.get());

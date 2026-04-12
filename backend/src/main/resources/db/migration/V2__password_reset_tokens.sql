@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
     created_by VARCHAR(255),
     updated_by VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_password_reset_tokens_users
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
