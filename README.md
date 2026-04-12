@@ -1,120 +1,143 @@
-# 🚀 MandiPro Platform
+# 🌾 Mandi-Pro
 
-MandiPro is a **full-stack platform** designed to power modern digital marketplaces with a scalable backend and a responsive frontend.
-
-The platform provides a robust API layer, secure authentication, and a clean user interface for interacting with marketplace data.
+> Smart trading management platform for mandi-based businesses
 
 ---
 
-## 🏗 Architecture Overview
+## 📌 Overview
 
-```text
-Frontend Application
-        │
-        ▼
-REST API (Spring Boot)
-        │
-        ▼
-PostgreSQL Database
-```
+**Mandi-Pro** is built for traders operating in mandis who:
 
-The system uses **stateless JWT authentication** and communicates through **RESTful APIs** between the frontend and backend services.
+- Purchase grains and produce from farmers
+- Store, process, and package goods
+- Sell to third parties for profit
+
+The platform provides **real-time visibility into trades, finances, and performance**—all in one place.
 
 ---
 
-## 📦 Repository Structure
+## 💼 What Problem It Solves
 
+Traditional mandi operations rely heavily on:
+
+- Manual bookkeeping
+- Fragmented records
+- Delayed profit/loss tracking
+
+👉 **Mandi-Pro digitizes and simplifies the entire workflow**
+
+---
+
+## 👤 Who It's For
+
+- Mandi traders
+- Grain wholesalers
+- Agri-based businesses
+
+---
+
+## 🚀 Key Features
+
+- 📊 **Trade Tracking**
+  Track every buy/sell transaction with complete details
+
+- 💰 **Financial Management**
+  Monitor money inflow/outflow across all trades
+
+- 📒 **Ledger System**
+  Maintain ledgers for:
+    - Parties (buyers/sellers)
+    - Grains / products
+    - Trade types
+
+- 📈 **Performance Insights**
+  Instantly view profit/loss per trade
+
+- ⚖️ **Claims & Damages Tracking**
+  Record losses, disputes, and adjustments
+
+- 🧾 **Expense Management**
+  Track mandi-specific costs like:
+    - Tola
+    - Bora
+    - Labor
+    - Transport
+
+---
+
+## 🧩 Tech Stack
+
+- ⚛️ Frontend: React
+- ☕ Backend: Spring Boot
+- ☁️ DATABASE: MySQL
+
+---
+
+## ⚙️ Quick Setup
+
+### 1️⃣ Clone the repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/Mandi-Pro.git
+cd Mandi-Pro
 ```
-mandipro/
 
-├── backend/
-│   Spring Boot application
-│
-└── frontend/
-    Web client application
+### 2️⃣ Run Backend
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+### 3️⃣ Run Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
 
 ## 📚 Documentation
 
-Full documentation for the platform is available in the **Project Wiki**.
+For detailed documentation, architecture, and workflows:
 
-👉 **[Open the Wiki](../../wiki)**
-
-The wiki includes:
-
-- Platform architecture
-- Backend documentation
-- Frontend documentation
-- Development setup
-- Authentication flow
-- Database migrations
-- Contribution guidelines
+👉 **Visit the Wiki**
+https://github.com/Build-Grid/Mandi-Pro/wiki
 
 ---
 
-## ⚡ Quick Start (Development)
+## 🔗 Project Navigation
 
-### Backend
-
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-Backend runs at:
-
-```
-http://localhost:8080
-```
-
-Swagger API documentation:
-
-```
-http://localhost:8080/swagger-ui/index.html
-```
+- 📖 [Contributing Guide](./CONTRIBUTING.md)
+- 🧠 [Commit Convention](./COMMIT_CONVENTION.md)
+- 🐛 [Issues](https://github.com/Build-Grid/Mandi-Pro/issues)
+- 💬 [Discussions](https://github.com/Build-Grid/Mandi-Pro/discussions)
 
 ---
 
-### Frontend
+## 🔐 Security
 
-```bash
-npm install
-npm run dev
-```
+Report vulnerabilities responsibly:
 
-Frontend runs at:
-
-```
-http://localhost:5173
-```
+📧 [thebuildgrid@gmail.com](mailto:thebuildgrid@gmail.com)
+📄 [Security Policy](./.github/SECURITY.md)
 
 ---
 
-## 🛠 Development Status
+## 👥 Contributors
 
-🚧 **Project Status:** Active Development
-
-Some features and documentation are still in progress.
+See [CONTRIBUTORS.md](./CONTRIBUTORS.md)
 
 ---
 
-## 🤝 Contributing
+## ⭐ Support
 
-Contributions are welcome.
+If you find this project useful:
 
-Please read the **[Contributing Guide](../../wiki/Contributing-Guide)** before submitting pull requests.
-
----
-
-## 📄 License
-
-(TO BE UPDATED)
+- ⭐ Star the repository
+- 🐛 Report issues
+- 💡 Suggest features
 
 ---
-
-<p align="center">
-
-Built with ❤️ by the **Build-Grid Engineering Team**
-
-</p>

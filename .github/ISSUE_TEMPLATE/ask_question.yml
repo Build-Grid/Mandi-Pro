@@ -1,0 +1,32 @@
+name: ❓ Question
+description: Ask a question about the project
+title: "[QUESTION] "
+labels: ["type: question"]
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              ## ❓ Question
+
+    - type: textarea
+      id: question
+      attributes:
+          label: 💬 Your Question
+          placeholder: Ask your question clearly
+      validations:
+          required: true
+
+    - type: textarea
+      id: context
+      attributes:
+          label: 📌 Context
+          description: Provide context if needed
+
+    - type: checkboxes
+      id: checklist
+      attributes:
+          label: ✅ Checklist
+          options:
+              - label: I have checked the README and docs
+                required: true

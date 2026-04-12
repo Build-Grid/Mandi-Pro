@@ -1,0 +1,51 @@
+name: 🏗️ Backend CI
+
+on:
+    push:
+        paths:
+            - "backend/**"
+    pull_request:
+        paths:
+            - "backend/**"
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - name: 📥 Checkout
+              uses: actions/checkout@v4
+
+            - name: ☕ Setup Java 21
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 21
+
+            - name: 📦 Cache Maven
+              uses: actions/cache@v4
+              with:
+                  path: ~/.m2
+                  key: ${{ runner.os }}-maven-${{ hashFiles('backend/pom.xml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-maven-
+
+            - name: 🧪 Build & Test
+              run: |
+                  # Ensure the wrapper is executable
+                  chmod +x ./mvnw
+                  # Use the wrapper instead of system mvn
+                  ./mvnw clean verify -DskipTests
+
+            - name: 📦 Upload JAR
+              uses: actions/upload-artifact@v4
+              with:
+                  name: backend-jar
+                  path: backend/target/*.jar
