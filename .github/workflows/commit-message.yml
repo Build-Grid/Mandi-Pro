@@ -18,11 +18,11 @@ jobs:
                   commits=$(git log origin/${{ github.base_ref }}..HEAD --pretty=format:"%s")
 
                   echo "Checking commit messages..."
-                  for msg in $commits; do
+                  while IFS= read -r msg; do
                     if [[ ! "$msg" =~ ^\[(BACKEND|FRONTEND|DEVOPS|DATABASE|DOCUMENT)\]\ :\ .+ ]]; then
                       echo "❌ Invalid commit message: $msg"
                       exit 1
                     fi
-                  done
+                  done <<< "$commits"
 
                   echo "✅ All commit messages are valid"
