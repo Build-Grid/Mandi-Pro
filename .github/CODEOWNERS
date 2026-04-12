@@ -1,8 +1,19 @@
-# Default owners
-* @Build-Grid
+# ----------------------------
+# Global Owners (fallback)
+# ----------------------------
+* @Build-Grid/code_review
 
-# Backend
-/backend/ @Build-Grid
+# ----------------------------
+# Backend (Spring Boot)
+# ----------------------------
+/backend/ @Build-Grid/code_review
 
-# Frontend
-/frontend/ @Build-Grid
+# ----------------------------
+# Frontend (React)
+# ----------------------------
+/frontend/ @Build-Grid/code_review
+
+# ----------------------------
+# GitHub Config (CI/CD, templates)
+# ----------------------------
+/.github/ @Build-Grid/code_review

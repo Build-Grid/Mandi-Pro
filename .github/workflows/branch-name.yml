@@ -1,0 +1,17 @@
+name: 🌿 Branch Name Check
+
+on:
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    branch-name:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Validate branch name
+              uses: actions-ecosystem/action-regex-match@v2
+              with:
+                  text: ${{ github.head_ref }}
+                  regex: '^(backend|frontend|devops|database)\/(feature|bug|chore|refactor|documentation)\/[a-z0-9\-]+$'

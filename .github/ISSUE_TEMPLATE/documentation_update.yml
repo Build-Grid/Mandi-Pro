@@ -1,0 +1,41 @@
+name: 📘 Documentation
+description: Report issues or improvements related to documentation
+title: "[DOCS] "
+labels: ["type: documentation"]
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              ## 📘 Documentation Issue
+              Help us improve our documentation.
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: ❗ Issue Description
+          description: What is wrong or missing in the documentation?
+          placeholder: Describe the issue clearly
+      validations:
+          required: true
+
+    - type: textarea
+      id: location
+      attributes:
+          label: 📍 Location
+          description: Where is the issue located?
+          placeholder: README.md, API docs, etc.
+
+    - type: textarea
+      id: suggestion
+      attributes:
+          label: 💡 Suggested Improvement
+          description: How can we improve it?
+
+    - type: checkboxes
+      id: checklist
+      attributes:
+          label: ✅ Checklist
+          options:
+              - label: I have checked existing documentation issues
+                required: true
