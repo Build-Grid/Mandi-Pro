@@ -7,12 +7,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_users_firm_username", columnNames = {"firm_id", "username"})
-        }
-)
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -32,7 +27,7 @@ public class User extends BaseEntity {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "password", nullable = false)

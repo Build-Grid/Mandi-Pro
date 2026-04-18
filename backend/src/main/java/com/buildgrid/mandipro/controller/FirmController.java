@@ -4,6 +4,7 @@ import com.buildgrid.mandipro.constants.ApiPaths;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.dto.request.UpdateFirmProfileRequest;
 import com.buildgrid.mandipro.dto.request.UpdateUserRoleRequest;
+import com.buildgrid.mandipro.dto.response.FirmProfileResponse;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.payload.ApiResponse;
 import com.buildgrid.mandipro.service.FirmUserService;
@@ -64,6 +65,15 @@ public class FirmController {
         firmUserService.updateFirmProfile(request);
         log.info(LogMessages.OPERATION_COMPLETED, "api.firm.updateProfile", TraceIdUtil.get());
         return ResponseEntity.ok(ok("Firm profile updated successfully", null));
+    }
+
+    @Operation(summary = "Fetch firm profile", description = "Fetches firm profile details. Accessible by all roles.")
+    @GetMapping(ApiPaths.FIRM_PROFILE_FETCH)
+    public ResponseEntity<ApiResponse<FirmProfileResponse>> fetchFirmProfile(){
+        log.info(LogMessages.OPERATION_STARTED, "api.firm.fetchProfile", TraceIdUtil.get());
+        FirmProfileResponse response = firmUserService.fetchFirmProfile();
+        log.info(LogMessages.OPERATION_COMPLETED, "api.firm.fetchProfile", TraceIdUtil.get());
+        return ResponseEntity.ok(ok("Firm profile fetched successfully", response));
     }
 
     @Operation(summary = "Promote or demote user role", description = "Change role between EMPLOYEE and MANAGER. Accessible by OWNER and MANAGER.")

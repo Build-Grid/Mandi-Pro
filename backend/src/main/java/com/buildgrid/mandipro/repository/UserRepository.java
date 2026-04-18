@@ -1,6 +1,7 @@
 package com.buildgrid.mandipro.repository;
 
 import com.buildgrid.mandipro.constants.Status;
+import com.buildgrid.mandipro.entity.Role;
 import com.buildgrid.mandipro.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -29,4 +30,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
         return existsByUsernameAndFirm_IdAndStatus(username, firmId, Status.ACTIVE);
     }
     boolean existsByUsernameAndFirm_IdAndStatus(String username, Long firmId, Status status);
+
+    default Optional<User> getByRoleAndFirmId(Role role, Long firmId) {
+        return getByRoleAndFirm_IdAndStatus(role, firmId, Status.ACTIVE);
+    }
+    Optional<User> getByRoleAndFirm_IdAndStatus(Role role, Long firmId, Status status);
 }

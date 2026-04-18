@@ -21,6 +21,7 @@ public final class ApiPaths {
     public static final String FIRM_USER = "/user/{userId}";
     public static final String FIRM_USER_DELETE = "/user/{userId}/delete";
     public static final String FIRM_PROFILE = "/profile";
+    public static final String FIRM_PROFILE_FETCH = "/profile/fetch";
     public static final String FIRM_USER_ROLE = "/user/{userId}/role";
     public static final String FIRM_DELETE = "/delete";
 
@@ -30,4 +31,11 @@ public final class ApiPaths {
 
     public static final String INVITES = BASE + "/invites";
     public static final String INVITES_PREVIEW = "/preview";
+
+    public static final String COMMODITY_TYPE = BASE + "/commodity-type";
+    public static final String COMMODITY_TYPE_CREATE = "/create";
+    public static final String COMMODITY_TYPE_DELETE = "/delete/{id}";
+    public static final String COMMODITY_TYPE_UPDATE = "/update";
+    public static final String COMMODITY_TYPE_FETCH = "/fetch/{id}";
+    public static final String COMMODITY_TYPE_FETCH_ALL = "/fetch";
 }
