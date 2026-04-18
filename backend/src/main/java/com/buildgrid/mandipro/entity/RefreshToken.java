@@ -20,7 +20,7 @@ public class RefreshToken extends BaseEntity {
     @ToString.Include
     private Long id;
 
-    @Column(name = "token", unique = true, nullable = false)
+    @Column(name = "token", nullable = false)
     @ToString.Include
     private String token;
 

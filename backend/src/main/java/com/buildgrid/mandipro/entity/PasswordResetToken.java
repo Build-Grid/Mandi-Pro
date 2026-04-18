@@ -20,7 +20,7 @@ public class PasswordResetToken extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "token", unique = true, nullable = false)
+    @Column(name = "token", nullable = false)
     private String token;
 
     @ManyToOne(fetch = FetchType.EAGER)

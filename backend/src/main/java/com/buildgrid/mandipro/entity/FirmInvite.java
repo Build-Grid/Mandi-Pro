@@ -28,12 +28,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "firm_invites",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_firm_invites_firm_username", columnNames = {"firm_id", "username"})
-        }
-)
+@Table(name = "firm_invites")
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -49,7 +44,7 @@ public class FirmInvite extends BaseEntity {
     @JoinColumn(name = "firm_id", referencedColumnName = "firm_id", nullable = false)
     private Firm firm;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "username", nullable = false)
@@ -63,7 +58,7 @@ public class FirmInvite extends BaseEntity {
     @JoinColumn(name = "invited_by_user_id", referencedColumnName = "user_id", nullable = false)
     private User invitedByUser;
 
-    @Column(name = "token", unique = true)
+    @Column(name = "token")
     private String token;
 
     @Enumerated(EnumType.STRING)

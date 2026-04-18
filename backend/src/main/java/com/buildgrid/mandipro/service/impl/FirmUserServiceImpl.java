@@ -3,11 +3,14 @@ package com.buildgrid.mandipro.service.impl;
 import com.buildgrid.mandipro.constants.RoleConstants;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.constants.Status;
+import com.buildgrid.mandipro.dto.mapper.FirmMapper;
 import com.buildgrid.mandipro.dto.mapper.UserMapper;
 import com.buildgrid.mandipro.dto.request.UpdateFirmProfileRequest;
 import com.buildgrid.mandipro.dto.request.UpdateUserRoleRequest;
+import com.buildgrid.mandipro.dto.response.FirmProfileResponse;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.entity.Firm;
+import com.buildgrid.mandipro.entity.Role;
 import com.buildgrid.mandipro.entity.User;
 import com.buildgrid.mandipro.exception.AppException;
 import com.buildgrid.mandipro.exception.ResourceNotFoundException;
@@ -36,6 +39,7 @@ public class FirmUserServiceImpl implements FirmUserService {
     private final FirmRepository firmRepository;
     private final RoleRepository roleRepository;
     private final NativeQueryGateway nativeQueryGateway;
+    private final FirmMapper firmMapper;
 
     @Override
     @Transactional
@@ -145,6 +149,27 @@ public class FirmUserServiceImpl implements FirmUserService {
         log.info(LogMessages.USER_ROLE_UPDATED, savedUser.getId(), targetRole.name(), TraceIdUtil.get());
         log.info(LogMessages.OPERATION_COMPLETED, "firm.updateUserRole", TraceIdUtil.get());
         return userMapper.toResponse(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public FirmProfileResponse fetchFirmProfile() {
+        log.info(LogMessages.OPERATION_STARTED, "firm.fetchFirmProfile", TraceIdUtil.get());
+
+        User currentUser = getCurrentUserOrThrow();
+        Firm firm = currentUser.getFirm();
+
+        FirmProfileResponse response = firmMapper.toFirmProfileResponse(firm);
+        Role ownerRole = roleRepository.findByName(RoleConstants.OWNER.name())
+                .orElseThrow(() -> new AppException("Owner role not found", HttpStatus.BAD_REQUEST));
+        User owner = userRepository.getByRoleAndFirmId(ownerRole,firm.getId())
+                .orElseThrow(() -> new AppException("Owner user not found for the firm", HttpStatus.BAD_REQUEST));
+        response.setOwnerEmail(owner.getEmail());
+        String ownerName = StringUtils.trimToNull(owner.getFirstName() + " " + owner.getLastName());
+        response.setOwnerName(ownerName.isEmpty() ? ownerName : owner.getUsername());
+
+        log.info(LogMessages.OPERATION_COMPLETED, "firm.fetchFirmProfile", TraceIdUtil.get());
+        return response;
     }
 
     @Override

@@ -91,9 +91,17 @@ public class SecurityConfig {
                         .requestMatchers(ApiPaths.ADMIN + "/**")
                         .hasRole(RoleConstants.ADMIN.name())
 
+                        // Any authenticated user can access
+                        .requestMatchers(
+                                ApiPaths.FIRM + ApiPaths.FIRM_PROFILE_FETCH,
+                                ApiPaths.COMMODITY_TYPE + ApiPaths.COMMODITY_TYPE_FETCH + "/**"
+                        ).authenticated()
+
                         // Owner and Manager
-                        .requestMatchers(ApiPaths.FIRM + "/**")
-                        .hasAnyRole(RoleConstants.OWNER.name(), RoleConstants.MANAGER.name())
+                        .requestMatchers(
+                                ApiPaths.FIRM + "/**",
+                                ApiPaths.COMMODITY_TYPE + "/**"
+                        ).hasAnyRole(RoleConstants.OWNER.name(), RoleConstants.MANAGER.name())
 
                         // everything else
                         .anyRequest().authenticated()
