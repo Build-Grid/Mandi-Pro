@@ -1,7 +1,5 @@
 package com.buildgrid.mandipro.service.impl;
 
-import com.buildgrid.mandipro.constants.LogMessages;
-import com.buildgrid.mandipro.constants.RoleConstants;
 import com.buildgrid.mandipro.constants.Status;
 import com.buildgrid.mandipro.dto.mapper.CommodityTypeMapper;
 import com.buildgrid.mandipro.dto.request.CommodityTypeRequest;
@@ -19,14 +17,15 @@ import com.buildgrid.mandipro.service.CommodityTypeService;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.buildgrid.mandipro.util.ValidationUtil.validateOwnerManager;
+import static com.buildgrid.mandipro.util.ValidationUtil.assertFirmActive;
+import static com.buildgrid.mandipro.util.ValidationUtil.sanitizeTrimToNull;
+import static com.buildgrid.mandipro.util.ValidationUtil.validateOwnerAndManager;
 import static java.util.Objects.isNull;
 
 @Service
@@ -43,7 +42,7 @@ public class CommodityTypeServiceImpl implements CommodityTypeService {
     public CommodityTypeResponse updateCommodityType(CommodityTypeUpdateRequest commodityTypeUpdateRequest) {
         sanitizeCommodityTypeUpdateRequest(commodityTypeUpdateRequest);
         User currentUser = getCurrentUserOrThrow();
-        validateOwnerManager(currentUser);
+        validateOwnerAndManager(currentUser, "commodityType.manage", "Only OWNER or MANAGER can manage commodity types");
         CommodityType commodityType = commodityTypeRepository.findById(commodityTypeUpdateRequest.getId())
                 .orElseThrow(() -> new AppException("Commodity type not found", HttpStatus.NOT_FOUND));
         if(!commodityType.getFirm().equals(currentUser.getFirm())){
@@ -63,7 +62,7 @@ public class CommodityTypeServiceImpl implements CommodityTypeService {
     @Transactional
     public void deleteCommodityType(Long id) {
         User currentUser = getCurrentUserOrThrow();
-        validateOwnerManager(currentUser);
+        validateOwnerAndManager(currentUser, "commodityType.manage", "Only OWNER or MANAGER can manage commodity types");
         CommodityType commodityType = commodityTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException("Commodity type not found", HttpStatus.NOT_FOUND));
         if (commodityType.getStatus() == Status.CANCEL) {
@@ -94,7 +93,7 @@ public class CommodityTypeServiceImpl implements CommodityTypeService {
         sanitizeCommodityTypeRequest(commodityTypeRequest);
 
         User currentUser = getCurrentUserOrThrow();
-        validateOwnerManager(currentUser);
+        validateOwnerAndManager(currentUser, "commodityType.manage", "Only OWNER or MANAGER can manage commodity types");
 
         CommodityType commodityType = commodityTypeMapper.toCommodityTypeEntity(commodityTypeRequest);
         commodityType.setFirm(currentUser.getFirm());
@@ -124,13 +123,13 @@ public class CommodityTypeServiceImpl implements CommodityTypeService {
     }
 
     private void sanitizeCommodityTypeRequest(CommodityTypeRequest commodityTypeRequest) {
-        commodityTypeRequest.setTypeName(StringUtils.trimToNull(commodityTypeRequest.getTypeName()));
-        commodityTypeRequest.setDescription(StringUtils.trimToNull(commodityTypeRequest.getDescription()));
+        commodityTypeRequest.setTypeName(sanitizeTrimToNull(commodityTypeRequest.getTypeName()));
+        commodityTypeRequest.setDescription(sanitizeTrimToNull(commodityTypeRequest.getDescription()));
     }
 
     private void sanitizeCommodityTypeUpdateRequest(CommodityTypeUpdateRequest commodityTypeUpdateRequest) {
-        commodityTypeUpdateRequest.setTypeName(StringUtils.trimToNull(commodityTypeUpdateRequest.getTypeName()));
-        commodityTypeUpdateRequest.setDescription(StringUtils.trimToNull(commodityTypeUpdateRequest.getDescription()));
+        commodityTypeUpdateRequest.setTypeName(sanitizeTrimToNull(commodityTypeUpdateRequest.getTypeName()));
+        commodityTypeUpdateRequest.setDescription(sanitizeTrimToNull(commodityTypeUpdateRequest.getDescription()));
     }
 
     private User getCurrentUserOrThrow() {
@@ -145,14 +144,4 @@ public class CommodityTypeServiceImpl implements CommodityTypeService {
         return user;
     }
 
-    private void assertFirmActive(Firm firm, String operationName) {
-        if (firm.getStatus() != Status.ACTIVE) {
-            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
-                    operationName,
-                    firm.getId(),
-                    firm.getStatus(),
-                    TraceIdUtil.get());
-            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
-        }
-    }
 }

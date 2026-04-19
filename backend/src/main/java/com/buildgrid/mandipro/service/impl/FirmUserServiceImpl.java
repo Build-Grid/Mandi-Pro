@@ -30,6 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.buildgrid.mandipro.util.ValidationUtil.assertFirmActive;
+import static com.buildgrid.mandipro.util.ValidationUtil.validateOwnerAndManager;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -125,7 +128,7 @@ public class FirmUserServiceImpl implements FirmUserService {
         log.info(LogMessages.OPERATION_STARTED, "firm.updateUserRole", TraceIdUtil.get());
 
         User actor = getCurrentUserOrThrow();
-        validateOwnerManager(actor);
+        validateOwnerAndManager(actor, "firm.updateUserRole", "Only OWNER or MANAGER can update user role");
 
         User targetUser = fetchUserFromIdOrThrow(userId);
         if (targetUser.getId().equals(actor.getId())) {
@@ -188,14 +191,6 @@ public class FirmUserServiceImpl implements FirmUserService {
         return StringUtils.equals(currentUser.getRole().getName(),RoleConstants.OWNER.name());
     }
 
-    private void validateOwnerManager(User user) {
-        RoleConstants role = RoleConstants.valueOf(user.getRole().getName());
-        if (role != RoleConstants.OWNER && role != RoleConstants.MANAGER) {
-            log.warn(LogMessages.OPERATION_FORBIDDEN, "firm.updateUserRole", user.getEmail(), TraceIdUtil.get());
-            throw new AppException("Only OWNER or MANAGER can update user role", HttpStatus.FORBIDDEN);
-        }
-    }
-
     private void validatePromotableRole(RoleConstants role) {
         if (role != RoleConstants.MANAGER && role != RoleConstants.EMPLOYEE) {
             throw new AppException("Only EMPLOYEE and MANAGER roles can be updated", HttpStatus.BAD_REQUEST);
@@ -244,15 +239,5 @@ public class FirmUserServiceImpl implements FirmUserService {
         return firm.getId();
     }
 
-    private void assertFirmActive(Firm firm, String operationName) {
-        if (firm.getStatus() != Status.ACTIVE) {
-            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
-                    operationName,
-                    firm.getId(),
-                    firm.getStatus(),
-                    TraceIdUtil.get());
-            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
-        }
-    }
 }
 

@@ -38,6 +38,11 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import static com.buildgrid.mandipro.util.ValidationUtil.assertFirmActive;
+import static com.buildgrid.mandipro.util.ValidationUtil.sanitizeLowerTrimToNull;
+import static com.buildgrid.mandipro.util.ValidationUtil.sanitizeTrimToNull;
+import static com.buildgrid.mandipro.util.ValidationUtil.validateOwnerAndManager;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -58,7 +63,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         log.info(LogMessages.OPERATION_STARTED, "firmInvite.sendInvite", TraceIdUtil.get());
 
         User inviter = getCurrentUserOrThrow();
-        validateOwnerManager(inviter);
+        validateOwnerAndManager(inviter, "firmInvite.manage", "Only OWNER or MANAGER can manage invites");
         Long firmId = getFirmIdOrThrow(inviter);
 
         sanitizeInviteRequest(request);
@@ -84,7 +89,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         log.info(LogMessages.OPERATION_STARTED, "firmInvite.listInvites", TraceIdUtil.get());
 
         User currentUser = getCurrentUserOrThrow();
-        validateOwnerManager(currentUser);
+        validateOwnerAndManager(currentUser, "firmInvite.manage", "Only OWNER or MANAGER can manage invites");
         Long firmId = getFirmIdOrThrow(currentUser);
 
         List<FirmInviteResponse> responses = firmInviteRepository.findByFirm_IdOrderByCreatedAtDesc(firmId)
@@ -103,7 +108,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         log.info(LogMessages.OPERATION_STARTED, "firmInvite.cancelInvite", TraceIdUtil.get());
 
         User currentUser = getCurrentUserOrThrow();
-        validateOwnerManager(currentUser);
+        validateOwnerAndManager(currentUser, "firmInvite.manage", "Only OWNER or MANAGER can manage invites");
         Long firmId = getFirmIdOrThrow(currentUser);
 
         FirmInvite invite = getInviteOrThrow(firmId, inviteId);
@@ -123,7 +128,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         log.info(LogMessages.OPERATION_STARTED, "firmInvite.resendInvite", TraceIdUtil.get());
 
         User currentUser = getCurrentUserOrThrow();
-        validateOwnerManager(currentUser);
+        validateOwnerAndManager(currentUser, "firmInvite.manage", "Only OWNER or MANAGER can manage invites");
         Long firmId = getFirmIdOrThrow(currentUser);
 
         FirmInvite invite = getInviteOrThrow(firmId, inviteId);
@@ -194,14 +199,14 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     }
 
     private void sanitizeInviteRequest(FirmInviteCreateRequest request) {
-        request.setEmail(StringUtils.trimToNull(StringUtils.lowerCase(request.getEmail())));
-        request.setUsername(StringUtils.trimToNull(request.getUsername()));
+        request.setEmail(sanitizeLowerTrimToNull(request.getEmail()));
+        request.setUsername(sanitizeTrimToNull(request.getUsername()));
     }
 
     private void sanitizeAcceptInviteRequest(AcceptInviteRequest request) {
-        request.setToken(StringUtils.trimToNull(request.getToken()));
-        request.setFirstName(StringUtils.trimToNull(request.getFirstName()));
-        request.setLastName(StringUtils.trimToNull(request.getLastName()));
+        request.setToken(sanitizeTrimToNull(request.getToken()));
+        request.setFirstName(sanitizeTrimToNull(request.getFirstName()));
+        request.setLastName(sanitizeTrimToNull(request.getLastName()));
     }
 
     private void validateUniquenessForInvitation(String email, String username, Long firmId) {
@@ -222,14 +227,6 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     private void validateInviteRole(RoleConstants role) {
         if (role != RoleConstants.MANAGER && role != RoleConstants.EMPLOYEE) {
             throw new AppException("Role must be MANAGER or EMPLOYEE", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    private void validateOwnerManager(User user) {
-        RoleConstants role = RoleConstants.valueOf(user.getRole().getName());
-        if (role != RoleConstants.OWNER && role != RoleConstants.MANAGER) {
-            log.warn(LogMessages.OPERATION_FORBIDDEN, "firmInvite.manage", user.getEmail(), TraceIdUtil.get());
-            throw new AppException("Only OWNER or MANAGER can manage invites", HttpStatus.FORBIDDEN);
         }
     }
 
@@ -278,17 +275,6 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         }
 
         return user;
-    }
-
-    private void assertFirmActive(Firm firm, String operationName) {
-        if (firm.getStatus() != Status.ACTIVE) {
-            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
-                    operationName,
-                    firm.getId(),
-                    firm.getStatus(),
-                    TraceIdUtil.get());
-            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
-        }
     }
 
 
