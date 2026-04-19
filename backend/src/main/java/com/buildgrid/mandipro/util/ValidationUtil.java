@@ -2,9 +2,12 @@ package com.buildgrid.mandipro.util;
 
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.constants.RoleConstants;
+import com.buildgrid.mandipro.constants.Status;
+import com.buildgrid.mandipro.entity.Firm;
 import com.buildgrid.mandipro.entity.User;
 import com.buildgrid.mandipro.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
 import java.util.regex.Pattern;
@@ -35,11 +38,32 @@ public final class ValidationUtil {
         }
     }
 
-    public static void validateOwnerManager(User user) {
+    public static void validateOwnerAndManager(User user, String operationName, String forbiddenMessage) {
         RoleConstants role = RoleConstants.valueOf(user.getRole().getName());
         if (role != RoleConstants.OWNER && role != RoleConstants.MANAGER) {
-            log.warn(LogMessages.OPERATION_FORBIDDEN, "firmInvite.manage", user.getEmail(), TraceIdUtil.get());
-            throw new AppException("Only OWNER or MANAGER can manage invites", HttpStatus.FORBIDDEN);
+            log.warn(LogMessages.OPERATION_FORBIDDEN, operationName, user.getEmail(), TraceIdUtil.get());
+            throw new AppException(forbiddenMessage, HttpStatus.FORBIDDEN);
         }
     }
+
+
+    public static void assertFirmActive(Firm firm, String operationName) {
+        if (firm.getStatus() != Status.ACTIVE) {
+            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
+                    operationName,
+                    firm.getId(),
+                    firm.getStatus(),
+                    TraceIdUtil.get());
+            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    public static String sanitizeTrimToNull(String value) {
+        return StringUtils.trimToNull(value);
+    }
+
+    public static String sanitizeLowerTrimToNull(String value) {
+        return StringUtils.trimToNull(StringUtils.lowerCase(value));
+    }
+
 }
