@@ -42,4 +42,6 @@ public final class LogMessages {
     public static final String USER_PASSWORD_CHANGED = "User password changed for: {} | traceId: {}";
     public static final String FIRM_PROFILE_UPDATED = "Firm profile updated for firmId: {} | traceId: {}";
     public static final String USER_ROLE_UPDATED = "User role updated for userId: {} | newRole: {} | traceId: {}";
+
+    public static final String NO_SUCH_FIELD_WARN = "No such filed: {} in class: {} | traceId: {}";
 }

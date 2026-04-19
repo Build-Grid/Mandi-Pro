@@ -38,4 +38,14 @@ public final class ApiPaths {
     public static final String COMMODITY_TYPE_UPDATE = "/update";
     public static final String COMMODITY_TYPE_FETCH = "/fetch/{id}";
     public static final String COMMODITY_TYPE_FETCH_ALL = "/fetch";
+
+    public static final String UNIT = BASE + "/unit";
+    public static final String UNIT_FETCH_ALL_GROUP_BY_TYPE = "/fetch";
+
+    public static final String COMMODITY =  BASE + "/commodity";
+    public static final String COMMODITY_FETCH = "/fetch/{id}";
+    public static final String COMMODITY_FETCH_ALL = "/fetch";
+    public static final String COMMODITY_CREATE = "/create";
+    public static final String COMMODITY_DELETE = "/delete/{id}";
+    public static final String COMMODITY_UPDATE = "/update/{id}";
 }
