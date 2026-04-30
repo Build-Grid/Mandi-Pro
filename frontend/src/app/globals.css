@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+}
+
+@keyframes float-slow {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes fade-up {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes soft-glow {
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes review-marquee-left {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(59, 130, 246, 0.12),
+            transparent 36%
+        ),
+        radial-gradient(
+            circle at top right,
+            rgba(15, 23, 42, 0.08),
+            transparent 30%
+        ),
+        var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+    scroll-behavior: smooth;
+}
+
+.animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-fade-up {
+    animation: fade-up 0.7s ease-out both;
+}
+
+.animate-soft-glow {
+    animation: soft-glow 6s ease-in-out infinite;
+}
+
+.review-marquee {
+    animation: review-marquee-left 36s linear infinite;
+}
+
+body {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(120, 200, 80, 0.08),
+            transparent 40%
+        ),
+        radial-gradient(
+            circle at top right,
+            rgba(217, 119, 6, 0.05),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            rgba(34, 197, 94, 0.06),
+            transparent 45%
+        ),
+        var(--background);
+}
