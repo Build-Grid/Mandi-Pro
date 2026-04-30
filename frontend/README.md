@@ -1,124 +1,36 @@
-# Mandi Pro Frontend
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Production-oriented React Router frontend for firm management and trade operations.
+## Getting Started
 
-## Stack
-
-- React + React Router (file-config route tree)
-- TypeScript
-- Tailwind CSS
-- Axios (centralized API client)
-- Redux Toolkit + React Redux (global UI/application state)
-
-## Route Map
-
-### Public
-
-- `/landing` -> Landing page with header and footer
-- `/auth/login` -> Login page
-- `/auth/register` -> Register firm and owner page
-
-### App Shell (Sidebar + Header)
-
-- `/` -> Home dashboard
-- `/FIRM` -> Firm management
-- `/FIRM/USER` -> Firm user management
-- `/FIRM/INVENTORY` -> Firm inventory
-- `/TRADE` -> Trade entry
-- `/TBD` -> Reserved feature route
-- `/PROFILE/USER` -> User profile
-- `/PROFILE/FIRM` -> Firm profile
-- `/PROFILE/USER/CHANGE-PASSWORD` -> Change password
-
-## Folder Structure
-
-```txt
-app/
-	api/
-		httpClient.ts
-	components/
-		common/
-		layout/
-	config/
-		env.ts
-	routes/
-		app-shell.tsx
-		landing.tsx
-		auth/
-		firm/
-		profile/
-	store/
-		index.ts
-		hooks.ts
-		slices/
-```
-
-## Environment Profiles (HTTP/HTTPS)
-
-This project supports protocol switching via profile-specific env files.
-
-### Development Profile
-
-File: `.env.development`
-
-```env
-VITE_APP_ENV=development
-VITE_API_PROTOCOL=http
-VITE_API_HOST=localhost
-VITE_API_PORT=3000
-VITE_API_BASE_PATH=/api
-```
-
-### Production Profile
-
-File: `.env.production`
-
-```env
-VITE_APP_ENV=production
-VITE_API_PROTOCOL=https
-VITE_API_HOST=api.mandi-pro.com
-VITE_API_PORT=443
-VITE_API_BASE_PATH=/api
-```
-
-`app/config/env.ts` builds the runtime API base URL from these variables.
-
-## Run Locally
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Start development server:
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-3. Open app:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- `http://localhost:5173/landing` for public landing
-- `http://localhost:5173/` for app shell
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Build and Serve
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-1. Build:
+## Learn More
 
-```bash
-npm run build
-```
+To learn more about Next.js, take a look at the following resources:
 
-2. Start server build:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-```bash
-npm run start
-```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Notes For Future Development
+## Deploy on Vercel
 
-- Use `app/api/httpClient.ts` for all HTTP calls. Add feature-specific API modules under `app/api/`.
-- Keep route components thin. Move reusable logic to `components/`, `store/`, and dedicated service modules.
-- Replace placeholder page content with feature modules incrementally without changing route contracts.
-- If auth is introduced, implement route guards around app-shell routes and central token handling in Axios interceptors.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
