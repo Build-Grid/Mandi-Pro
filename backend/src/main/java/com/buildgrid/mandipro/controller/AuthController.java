@@ -28,10 +28,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -168,6 +170,15 @@ public class AuthController {
         log.info(LogMessages.OPERATION_COMPLETED, "api.auth.acceptInvite", TraceIdUtil.get());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.of(HttpStatus.CREATED, "Invitation accepted successfully", userResponse));
+    }
+
+    @Operation(summary = "Get current user profile (cached per authenticated user)")
+    @GetMapping(ApiPaths.AUTH_ME_PROFILE)
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUserProfile() {
+        log.info(LogMessages.OPERATION_STARTED, "api.auth.getCurrentUserProfile", TraceIdUtil.get());
+        UserResponse response = authService.getCurrentUserProfile();
+        log.info(LogMessages.OPERATION_COMPLETED, "api.auth.getCurrentUserProfile", TraceIdUtil.get());
+        return ResponseEntity.ok(ApiResponse.ok("Profile retrieved successfully", response));
     }
 
     @Operation(summary = "Update current user profile (first name and last name)")

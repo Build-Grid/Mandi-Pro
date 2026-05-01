@@ -21,7 +21,7 @@ public class MandiProApplication {
     @Bean
     public CommandLineRunner logStartup(@Value("${SPRING_PROFILE:prod}") String profile,
                                       @Value("${server.port:8080}") String port,
-                                      @Value("${APP_VERSION:0.0.1}") String version) {
+                                      @Value("${spring.application.version:0.0.1}") String version) {
         return args -> {
             log.info(LogMessages.APP_STARTED, profile, port, version);
         };

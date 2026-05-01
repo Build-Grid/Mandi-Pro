@@ -81,6 +81,8 @@ public class SecurityConfig {
                                 ApiPaths.AUTH + ApiPaths.AUTH_RESET_PASSWORD,
                                 ApiPaths.AUTH + ApiPaths.AUTH_ACCEPT_INVITE,
                                 ApiPaths.INVITES + ApiPaths.INVITES_PREVIEW,
+                                ApiPaths.REVIEW + ApiPaths.REVIEW_FETCH_PUBLIC,
+                                ApiPaths.REVIEW + ApiPaths.REVIEW_POST,
                                 ApiPaths.HEALTH
                         ).permitAll()
 
@@ -88,7 +90,12 @@ public class SecurityConfig {
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
 
                         // Admin
-                        .requestMatchers(ApiPaths.ADMIN + "/**")
+                        .requestMatchers(
+                                ApiPaths.ADMIN + "/**",
+                                ApiPaths.REVIEW + ApiPaths.REVIEW_APPROVE_BY_ID,
+                                ApiPaths.REVIEW + ApiPaths.REVIEW_REJECT_BY_ID,
+                                ApiPaths.REVIEW + ApiPaths.REVIEW_FETCH_ALL
+                        )
                         .hasRole(RoleConstants.ADMIN.name())
 
                         // Any authenticated user can access

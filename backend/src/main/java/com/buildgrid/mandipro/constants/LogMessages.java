@@ -44,4 +44,6 @@ public final class LogMessages {
     public static final String USER_ROLE_UPDATED = "User role updated for userId: {} | newRole: {} | traceId: {}";
 
     public static final String NO_SUCH_FIELD_WARN = "No such filed: {} in class: {} | traceId: {}";
+
+    public static final String REVIEW_UPDATE_INFO = "Updating review with id {}: setting status to {}";
 }

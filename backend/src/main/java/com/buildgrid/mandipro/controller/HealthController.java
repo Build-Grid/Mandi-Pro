@@ -1,7 +1,6 @@
 package com.buildgrid.mandipro.controller;
 
 import com.buildgrid.mandipro.constants.ApiPaths;
-import com.buildgrid.mandipro.payload.ApiResponse;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +22,7 @@ public class HealthController {
     @Value("${SPRING_PROFILE:prod}")
     private String environment;
 
-    @Value("${APP_VERSION:0.0.1}")
+    @Value("${spring.application.version:0.0.1}")
     private String version;
 
     @Operation(summary = "Get health status of the application")
