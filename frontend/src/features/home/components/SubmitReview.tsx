@@ -61,18 +61,47 @@ function RatingPicker({
 
 export function SubmitReview() {
     const [name, setName] = useState("");
-    const [text, setText] = useState("");
-    const [stars, setStars] = useState(4.5);
+    const [review, setReview] = useState("");
+    const [rating, setRating] = useState(4.5);
+    const [successMessage, setSuccessMessage] = useState("");
     const mutation = useSubmitReview();
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setSuccessMessage("");
+        mutation.mutate(
+            { name, review, rating: String(rating) },
+            {
+                onSuccess: () => {
+                    setSuccessMessage(
+                        "Thank you! Your review has been submitted.",
+                    );
+                    setName("");
+                    setReview("");
+                    setRating(4.5);
+                    setTimeout(() => setSuccessMessage(""), 3000);
+                },
+            },
+        );
+    };
 
     return (
         <form
-            onSubmit={(e) => {
-                e.preventDefault();
-                mutation.mutate({ name, text, stars });
-            }}
+            onSubmit={handleSubmit}
             className="mt-8 grid gap-4 rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 via-emerald-50 to-green-50 p-5 shadow-sm sm:grid-cols-2 sm:p-6 transition duration-300 hover:shadow-md"
         >
+            {successMessage && (
+                <div className="sm:col-span-2 rounded-lg bg-emerald-50 border border-emerald-200 p-3 text-sm text-emerald-800">
+                    {successMessage}
+                </div>
+            )}
+
+            {mutation.isError && (
+                <div className="sm:col-span-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+                    Failed to submit review. Please try again.
+                </div>
+            )}
+
             <div className="sm:col-span-2 grid gap-2">
                 <label className="text-sm font-medium text-emerald-800">
                     Name
@@ -80,7 +109,8 @@ export function SubmitReview() {
                 <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-slate-900 outline-none ring-amber-400 transition duration-200 focus:ring-2"
+                    disabled={mutation.isPending}
+                    className="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-slate-900 outline-none ring-amber-400 transition duration-200 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Your name"
                     required
                 />
@@ -91,10 +121,11 @@ export function SubmitReview() {
                     Review
                 </label>
                 <textarea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    value={review}
+                    onChange={(e) => setReview(e.target.value)}
+                    disabled={mutation.isPending}
                     rows={4}
-                    className="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-slate-900 outline-none ring-amber-400 transition duration-200 focus:ring-2"
+                    className="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-slate-900 outline-none ring-amber-400 transition duration-200 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Tell others about your experience"
                     required
                 />
@@ -104,7 +135,7 @@ export function SubmitReview() {
                 <label className="text-sm font-medium text-emerald-800">
                     Rating
                 </label>
-                <RatingPicker value={stars} onChange={setStars} />
+                <RatingPicker value={rating} onChange={setRating} />
                 <p className="text-xs text-emerald-700/90">
                     Click left half for 0.5 and right half for full star.
                 </p>
@@ -113,7 +144,9 @@ export function SubmitReview() {
             <div className="sm:col-span-2 flex items-end justify-end">
                 <button
                     type="submit"
-                    disabled={mutation.isPending}
+                    disabled={
+                        mutation.isPending || !name.trim() || !review.trim()
+                    }
                     className="rounded-full bg-linear-to-r from-amber-600 to-amber-700 px-5 py-2.5 text-white shadow shadow-amber-600/30 transition duration-300 hover:shadow-lg hover:shadow-amber-600/40 hover:from-amber-700 hover:to-amber-800 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                     {mutation.isPending ? "Submitting..." : "Submit Review"}

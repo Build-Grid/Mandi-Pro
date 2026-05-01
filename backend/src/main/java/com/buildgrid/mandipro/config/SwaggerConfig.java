@@ -15,7 +15,7 @@ public class SwaggerConfig {
     @Value("${APP_NAME}")
     private String appName;
 
-    @Value("${APP_VERSION}")
+    @Value("${spring.application.version}")
     private String appVersion;
 
     @Bean

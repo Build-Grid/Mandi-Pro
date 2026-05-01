@@ -29,6 +29,8 @@ import com.buildgrid.mandipro.service.auth.RefreshTokenService;
 import com.buildgrid.mandipro.util.TraceIdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -160,7 +162,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "userProfile",
+            key = "T(com.buildgrid.mandipro.security.SecurityUtils).getCurrentUserEmail().orElse('anonymous')",
+            unless = "#result == null"
+    )
+    public UserResponse getCurrentUserProfile() {
+        log.info(LogMessages.OPERATION_STARTED, "auth.getCurrentUserProfile", TraceIdUtil.get());
+
+        User currentUser = getCurrentUserOrThrow();
+        assertUserFirmActive(currentUser, "auth.getCurrentUserProfile");
+
+        log.info(LogMessages.OPERATION_COMPLETED, "auth.getCurrentUserProfile", TraceIdUtil.get());
+        return userMapper.toResponse(currentUser);
+    }
+
+    @Override
     @Transactional
+    @CacheEvict(
+            value = "userProfile",
+            key = "T(com.buildgrid.mandipro.security.SecurityUtils).getCurrentUserEmail().orElse('anonymous')"
+    )
     public UserResponse updateCurrentUserProfile(UpdateCurrentUserProfileRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "auth.updateCurrentUserProfile", TraceIdUtil.get());
 

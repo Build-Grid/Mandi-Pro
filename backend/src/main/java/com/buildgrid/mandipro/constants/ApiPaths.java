@@ -53,4 +53,11 @@ public final class ApiPaths {
     public static final String PARTIES = BASE + "/parties";
     public static final String PARTIES_BULK = "/bulk";
     public static final String PARTIES_BY_ID = "/{id}";
+
+    public static final String REVIEW = BASE + "/review";
+    public static final String REVIEW_POST = "/post";
+    public static final String REVIEW_FETCH_ALL = "/fetch";
+    public static final String REVIEW_FETCH_PUBLIC = "/fetch/public";
+    public static final String REVIEW_APPROVE_BY_ID = "/approve/{id}";
+    public static final String REVIEW_REJECT_BY_ID = "/reject/{id}";
 }
