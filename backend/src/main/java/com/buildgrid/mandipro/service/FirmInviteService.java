@@ -4,7 +4,7 @@ import com.buildgrid.mandipro.dto.request.AcceptInviteRequest;
 import com.buildgrid.mandipro.dto.request.FirmInviteCreateRequest;
 import com.buildgrid.mandipro.dto.response.FirmInviteResponse;
 import com.buildgrid.mandipro.dto.response.InvitePreviewResponse;
-import com.buildgrid.mandipro.dto.response.UserResponse;
+import com.buildgrid.mandipro.dto.response.LoginResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +20,6 @@ public interface FirmInviteService {
 
     InvitePreviewResponse previewInvite(String token);
 
-    UserResponse acceptInvite(AcceptInviteRequest request);
+    LoginResponse acceptInvite(AcceptInviteRequest request);
 }
 

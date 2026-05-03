@@ -24,6 +24,7 @@ import com.buildgrid.mandipro.util.TraceIdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +63,7 @@ public class FirmUserServiceImpl implements FirmUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "userProfile", allEntries = true)
     public void cancelUser(Long userId) {
         log.info(LogMessages.OPERATION_STARTED, "firm.cancelUser", TraceIdUtil.get());
 
@@ -124,6 +126,7 @@ public class FirmUserServiceImpl implements FirmUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "userProfile", allEntries = true)
     public UserResponse updateUserRole(Long userId, UpdateUserRoleRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "firm.updateUserRole", TraceIdUtil.get());
 

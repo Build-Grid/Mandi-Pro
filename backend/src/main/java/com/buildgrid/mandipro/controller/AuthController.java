@@ -164,12 +164,13 @@ public class AuthController {
 
     @Operation(summary = "Accept a firm invitation and complete onboarding")
     @PostMapping(ApiPaths.AUTH_ACCEPT_INVITE)
-    public ResponseEntity<ApiResponse<UserResponse>> acceptInvite(@Valid @RequestBody AcceptInviteRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> acceptInvite(@Valid @RequestBody AcceptInviteRequest request, HttpServletResponse response) {
         log.info(LogMessages.OPERATION_STARTED, "api.auth.acceptInvite", TraceIdUtil.get());
-        UserResponse userResponse = firmInviteService.acceptInvite(request);
+        LoginResponse loginResponse = firmInviteService.acceptInvite(request);
+        setAuthCookies(response, loginResponse);
         log.info(LogMessages.OPERATION_COMPLETED, "api.auth.acceptInvite", TraceIdUtil.get());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.of(HttpStatus.CREATED, "Invitation accepted successfully", userResponse));
+                .body(ApiResponse.of(HttpStatus.CREATED, "Invitation accepted successfully", loginResponse));
     }
 
     @Operation(summary = "Get current user profile (cached per authenticated user)")
