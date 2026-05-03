@@ -25,5 +25,5 @@ public class Firm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name ="plan_type",nullable = false)
     @Builder.Default
-    private PlanTypeConstans planType=PlanTypeConstans.STANDARD;
+    private PlanTypeConstans planType = PlanTypeConstans.STANDARD;
 }

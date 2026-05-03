@@ -1,6 +1,6 @@
 import AuthCard from "@/features/auth/components/AuthCard";
 import Logo from "@/features/auth/components/Logo";
-import LoginForm from "@/features/auth/components/LoginForm";
+import LoginGuard from "@/features/auth/components/LoginGuard";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -28,7 +28,7 @@ export default function LoginPage() {
                         <h2 className="mb-4 text-xl font-semibold">
                             Welcome Back
                         </h2>
-                        <LoginForm />
+                        <LoginGuard />
                     </div>
                 </AuthCard>
             </div>

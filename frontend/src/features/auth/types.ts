@@ -27,6 +27,7 @@ export interface AuthData {
 }
 
 export type AuthResponse = ApiResponse<AuthData>;
+export type RefreshResponse = ApiResponse<AuthData>;
 
 export interface ForgotPasswordResponse {
     message: string;

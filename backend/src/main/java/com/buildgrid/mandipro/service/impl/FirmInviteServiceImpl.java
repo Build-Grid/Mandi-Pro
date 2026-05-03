@@ -9,8 +9,10 @@ import com.buildgrid.mandipro.dto.mapper.FirmInviteMapper;
 import com.buildgrid.mandipro.dto.mapper.UserMapper;
 import com.buildgrid.mandipro.dto.request.AcceptInviteRequest;
 import com.buildgrid.mandipro.dto.request.FirmInviteCreateRequest;
+import com.buildgrid.mandipro.dto.request.LoginRequest;
 import com.buildgrid.mandipro.dto.response.FirmInviteResponse;
 import com.buildgrid.mandipro.dto.response.InvitePreviewResponse;
+import com.buildgrid.mandipro.dto.response.LoginResponse;
 import com.buildgrid.mandipro.dto.response.UserResponse;
 import com.buildgrid.mandipro.entity.Firm;
 import com.buildgrid.mandipro.entity.FirmInvite;
@@ -21,6 +23,7 @@ import com.buildgrid.mandipro.repository.FirmInviteRepository;
 import com.buildgrid.mandipro.repository.RoleRepository;
 import com.buildgrid.mandipro.repository.UserRepository;
 import com.buildgrid.mandipro.security.SecurityUtils;
+import com.buildgrid.mandipro.service.AuthService;
 import com.buildgrid.mandipro.service.EmailService;
 import com.buildgrid.mandipro.service.FirmInviteService;
 import com.buildgrid.mandipro.util.TraceIdUtil;
@@ -56,6 +59,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     private final UserMapper userMapper;
     private final EmailService emailService;
     private final InviteConfig inviteConfig;
+    private final AuthService authService;
 
     @Override
     @Transactional
@@ -115,6 +119,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         ensurePendingAndNotExpired(invite);
 
         invite.setInviteStatus(InviteStatus.CANCELLED);
+        invite.setStatus(Status.CANCEL);
         invite.setToken(null);
         firmInviteRepository.save(invite);
 
@@ -163,7 +168,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
 
     @Override
     @Transactional
-    public UserResponse acceptInvite(AcceptInviteRequest request) {
+    public LoginResponse acceptInvite(AcceptInviteRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "firmInvite.acceptInvite", TraceIdUtil.get());
 
         sanitizeAcceptInviteRequest(request);
@@ -192,10 +197,17 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         invite.setToken(null);
         invite.setStatus(Status.CANCEL);
         firmInviteRepository.save(invite);
-
         log.info(LogMessages.FIRM_INVITE_ACCEPTED, invite.getEmail(), invite.getFirm().getId(), TraceIdUtil.get());
+
+        // Login user
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email(invite.getEmail())
+                .password(request.getPassword())
+                .build();
+        LoginResponse loginResponse = authService.login(loginRequest);
+
         log.info(LogMessages.OPERATION_COMPLETED, "firmInvite.acceptInvite", TraceIdUtil.get());
-        return userMapper.toResponse(savedUser);
+        return loginResponse;
     }
 
     private void sanitizeInviteRequest(FirmInviteCreateRequest request) {

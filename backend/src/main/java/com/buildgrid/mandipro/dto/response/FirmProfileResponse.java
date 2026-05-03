@@ -1,5 +1,6 @@
 package com.buildgrid.mandipro.dto.response;
 
+import com.buildgrid.mandipro.constants.PlanTypeConstans;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class FirmProfileResponse {
     String name;
     String ownerName;
     String ownerEmail;
+    PlanTypeConstans planType;
     LocalDateTime createAt;
 }

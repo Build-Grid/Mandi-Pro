@@ -1,6 +1,6 @@
 import AuthCard from "@/features/auth/components/AuthCard";
 import Logo from "@/features/auth/components/Logo";
-import RegisterForm from "@/features/auth/components/RegisterForm";
+import RegisterGuard from "@/features/auth/components/RegisterGuard";
 import Image from "next/image";
 
 export default function RegisterPage() {
@@ -27,7 +27,7 @@ export default function RegisterPage() {
                         <h2 className="mb-4 text-xl font-semibold">
                             Create Your Firm
                         </h2>
-                        <RegisterForm />
+                        <RegisterGuard />
                     </div>
                 </AuthCard>
             </div>

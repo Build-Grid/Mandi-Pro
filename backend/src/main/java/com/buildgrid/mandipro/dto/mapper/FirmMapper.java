@@ -19,6 +19,7 @@ public interface FirmMapper {
             @Mapping(target = "id", source = "id"),
             @Mapping(target = "name", source = "name"),
             @Mapping(target = "createAt", source = "createdAt"),
+            @Mapping(target = "planType", source = "planType"),
             @Mapping(target = "ownerName", ignore = true),
             @Mapping(target = "ownerEmail", ignore = true)
     })
