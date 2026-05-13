@@ -4,6 +4,7 @@ target/
 /mvnw.cmd
 .mvn/wrapper/maven-wrapper.properties
 .env
+.env.production
 .idea/
 *.iml
 .DS_Store

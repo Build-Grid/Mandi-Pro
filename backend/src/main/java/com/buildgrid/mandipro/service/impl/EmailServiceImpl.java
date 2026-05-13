@@ -3,68 +3,83 @@ package com.buildgrid.mandipro.service.impl;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.service.EmailService;
 import com.buildgrid.mandipro.util.TraceIdUtil;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.buildgrid.mandipro.constants.AppConstants.DATETIME_FORMAT_YYYYMMDDHHMM;
+
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
+    private final OkHttpClient client = new OkHttpClient();
+    private static final MediaType JSON = MediaType.get("application/json");
 
-    private final JavaMailSender mailSender;
-    private static final DateTimeFormatter INVITE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    @Value("${resend.api.key}")
+    private String apiKey;
 
-    @Value("${spring.mail.username}")
+    @Value("${app.mail.from}")
     private String fromEmail;
+
+    private void send(String to, String subject, String html) {
+        String body = """
+                    {
+                        "from": "MandiPro <%s>",
+                        "to": ["%s"],
+                        "subject": "%s",
+                        "html": %s
+                    }
+                """.formatted(fromEmail, to, subject, toJsonString(html));
+
+        Request request = new Request.Builder()
+                .url("https://api.resend.com/emails")
+                .post(RequestBody.create(body, JSON))
+                .addHeader("Authorization", "Bearer " + apiKey)
+                .addHeader("Content-Type", "application/json")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("Resend error: " + response.body().string());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
+    // Safely escapes HTML for embedding in JSON string
+    private String toJsonString(String html) {
+        return "\"" + html.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "") + "\"";
+    }
 
     @Override
     public void sendPasswordResetEmail(String to, String resetLink, int expiryMinutes) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject("Password Reset Request - MandiPro");
-            helper.setText(buildHtmlBody(resetLink, expiryMinutes), true);
-
-            mailSender.send(message);
+            send(to, "Password Reset Request - MandiPro", buildHtmlBody(resetLink, expiryMinutes));
             log.info(LogMessages.PASSWORD_RESET_EMAIL_SENT, to, TraceIdUtil.get());
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error(LogMessages.PASSWORD_RESET_EMAIL_FAILED, to, TraceIdUtil.get(), e);
             throw new RuntimeException("Failed to send password reset email", e);
         }
     }
 
     @Override
-    public void sendFirmInviteEmail(String to,
-                                    String firmName,
-                                    String invitedRole,
-                                    String inviterName,
-                                    String inviteeEmail,
-                                    LocalDateTime expiresAt,
-                                    String acceptLink) {
+    public void sendFirmInviteEmail(String to, String firmName, String invitedRole,
+                                    String inviterName, String inviteeEmail,
+                                    LocalDateTime expiresAt, String acceptLink) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject("You're invited to join " + firmName + " on MandiPro");
-            helper.setText(buildInviteHtmlBody(firmName, invitedRole, inviterName, inviteeEmail, expiresAt, acceptLink), true);
-
-            mailSender.send(message);
+            send(to, "You're invited to join " + firmName + " on MandiPro",
+                    buildInviteHtmlBody(firmName, invitedRole, inviterName, inviteeEmail, expiresAt, acceptLink));
             log.info(LogMessages.FIRM_INVITE_EMAIL_SENT, to, TraceIdUtil.get());
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error(LogMessages.FIRM_INVITE_EMAIL_FAILED, to, TraceIdUtil.get(), e);
             throw new RuntimeException("Failed to send firm invite email", e);
         }
@@ -150,7 +165,7 @@ public class EmailServiceImpl implements EmailService {
                                        String inviteeEmail,
                                        LocalDateTime expiresAt,
                                        String acceptLink) {
-        String formattedExpiry = expiresAt.format(INVITE_DATE_FORMATTER) + " UTC";
+        String formattedExpiry = expiresAt.format(DateTimeFormatter.ofPattern(DATETIME_FORMAT_YYYYMMDDHHMM)) + " UTC";
 
         return """
                 <!DOCTYPE html>
