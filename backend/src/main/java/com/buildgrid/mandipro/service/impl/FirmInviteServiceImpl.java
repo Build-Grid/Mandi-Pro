@@ -116,7 +116,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         Long firmId = getFirmIdOrThrow(currentUser);
 
         FirmInvite invite = getInviteOrThrow(firmId, inviteId);
-        ensurePendingAndNotExpired(invite);
+        ensurePending(invite);
 
         invite.setInviteStatus(InviteStatus.CANCELLED);
         invite.setStatus(Status.CANCEL);
@@ -137,7 +137,7 @@ public class FirmInviteServiceImpl implements FirmInviteService {
         Long firmId = getFirmIdOrThrow(currentUser);
 
         FirmInvite invite = getInviteOrThrow(firmId, inviteId);
-        ensurePendingAndNotExpired(invite);
+        ensurePending(invite);
 
         invite.setToken(generateSecureToken());
         invite.setExpiresAt(LocalDateTime.now().plusHours(inviteConfig.getExpiryHours()));
@@ -263,15 +263,19 @@ public class FirmInviteServiceImpl implements FirmInviteService {
     }
 
     private void ensurePendingAndNotExpired(FirmInvite invite) {
-        if (invite.getInviteStatus() != InviteStatus.PENDING) {
-            throw new AppException("Invitation is no longer active", HttpStatus.BAD_REQUEST);
-        }
+        ensurePending(invite);
 
         if (invite.isExpired()) {
             invite.setInviteStatus(InviteStatus.EXPIRED);
             invite.setToken(null);
             firmInviteRepository.save(invite);
             throw new AppException("Invitation has expired", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void ensurePending(FirmInvite invite) {
+        if (invite.getInviteStatus() != InviteStatus.PENDING) {
+            throw new AppException("Invitation is no longer active", HttpStatus.BAD_REQUEST);
         }
     }
 
