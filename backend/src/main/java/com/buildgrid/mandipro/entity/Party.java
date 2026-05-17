@@ -34,6 +34,12 @@ public class Party extends BaseEntity {
     @Column
     private String address;
 
+    @Column
+    private String village;
+
+    @Column
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "firm_id", nullable = false)
     private Firm firm;

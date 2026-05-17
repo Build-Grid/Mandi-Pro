@@ -1,27 +1,25 @@
-package com.buildgrid.mandipro.dto.response;
+package com.buildgrid.mandipro.dto.request;
 
 import com.buildgrid.mandipro.constants.PartyType;
-import com.buildgrid.mandipro.constants.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PartyResponse {
-    private Long id;
+public class PartyUpdateRequest {
     private String name;
+
     private PartyType type;
+
     private String contactNumber;
+
     private String address;
+
     private String village;
+
     private String description;
-    private Status status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

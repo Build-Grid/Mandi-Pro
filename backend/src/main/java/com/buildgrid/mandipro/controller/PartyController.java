@@ -3,6 +3,7 @@ package com.buildgrid.mandipro.controller;
 import com.buildgrid.mandipro.constants.ApiPaths;
 import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.dto.request.PartyRequest;
+import com.buildgrid.mandipro.dto.request.PartyUpdateRequest;
 import com.buildgrid.mandipro.dto.response.PartyResponse;
 import com.buildgrid.mandipro.payload.ApiResponse;
 import com.buildgrid.mandipro.service.PartyService;
@@ -58,7 +59,7 @@ public class PartyController {
 
     @Operation(summary = "Update party details", description = "Updates details of a specific party by ID.")
     @PutMapping(ApiPaths.PARTIES_BY_ID)
-    public ResponseEntity<ApiResponse<PartyResponse>> updateParty(@PathVariable Long id, @Valid @RequestBody PartyRequest request) {
+    public ResponseEntity<ApiResponse<PartyResponse>> updateParty(@PathVariable Long id, @Valid @RequestBody PartyUpdateRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "api.parties.update", TraceIdUtil.get());
         PartyResponse response = partyService.updateParty(id, request);
         log.info(LogMessages.OPERATION_COMPLETED, "api.parties.update", TraceIdUtil.get());
