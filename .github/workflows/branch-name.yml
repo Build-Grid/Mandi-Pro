@@ -9,11 +9,43 @@ jobs:
 
         steps:
             - name: Validate branch name
+              shell: bash
               run: |
                   BRANCH="${{ github.head_ref }}"
 
-                  if [[ ! "$BRANCH" =~ ^(backend|frontend|devops|database)/(feature|bug|chore|refactor|improvement|documentation)/[a-z0-9-]+$ ]]; then
+                  PATTERN='^(backend|frontend|devops|database)/(feature|bug|chore|refactor|improvement|documentation)/[a-z0-9-]+$'
+
+                  if [[ ! "$BRANCH" =~ $PATTERN ]]; then
                     echo "❌ Invalid branch name: $BRANCH"
+                    echo ""
+
+                    echo "📌 Expected format:"
+                    echo "   <system>/<type>/<short-description>"
+                    echo ""
+
+                    echo "✅ Allowed systems:"
+                    echo "   backend"
+                    echo "   frontend"
+                    echo "   devops"
+                    echo "   database"
+                    echo ""
+
+                    echo "✅ Allowed types:"
+                    echo "   feature"
+                    echo "   bug"
+                    echo "   chore"
+                    echo "   refactor"
+                    echo "   improvement"
+                    echo "   documentation"
+                    echo ""
+
+                    echo "✅ Example valid branch names:"
+                    echo "   backend/feature/add-login-api"
+                    echo "   frontend/bug/fix-navbar-overflow"
+                    echo "   devops/chore/update-github-actions"
+                    echo "   database/refactor/optimize-user-index"
+                    echo ""
+
                     exit 1
                   fi
 

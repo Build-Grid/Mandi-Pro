@@ -1,9 +1,21 @@
-export { OverviewWidgets } from "./panels/OverviewWidgets";
-export { TradePanel } from "./panels/TradePanel";
-export { CommodityPanel } from "./panels/CommodityPanel";
-export { LedgerPanel } from "./panels/LedgerPanel";
-export { ReportsPanel } from "./panels/ReportsPanel";
-export { InventoryPanel } from "./panels/InventoryPanel";
-export { MarketplacePanel } from "./panels/MarketplacePanel";
-export { AdminPanel } from "./panels/AdminPanel";
-export type { AdminPanelMode } from "./panels/AdminPanel";
+import { OverviewWidgets } from "@/features/dashboard/components/panels/OverviewWidgets";
+import { TradePanel } from "@/features/dashboard/components/panels/TradePanel";
+import { LedgerPanel } from "@/features/dashboard/components/panels/LedgerPanel";
+import { ReportsPanel } from "@/features/dashboard/components/panels/ReportsPanel";
+import { InventoryPanel } from "@/features/dashboard/components/panels/InventoryPanel";
+import { MarketplacePanel } from "@/features/dashboard/components/panels/MarketplacePanel";
+import {
+    AdminPanel,
+    type AdminPanelMode,
+} from "@/features/dashboard/components/panels/AdminPanel";
+
+export {
+    OverviewWidgets,
+    TradePanel,
+    LedgerPanel,
+    ReportsPanel,
+    InventoryPanel,
+    MarketplacePanel,
+    AdminPanel,
+};
+export type { AdminPanelMode };
