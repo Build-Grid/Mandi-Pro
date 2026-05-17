@@ -14,6 +14,7 @@ import { NAV_SECTIONS, type NavSection } from "./constants";
 import { fetchDashboardData } from "./api";
 import type { DashboardData, QuickAction } from "./types";
 import type { User } from "@/common/types";
+import { canManageCommodityCatalog } from "./constants";
 
 export function useDashboardData() {
     return useQuery<DashboardData>({
@@ -41,6 +42,15 @@ export function useDashboardSidebarGroups({
 
             for (const item of section.items) {
                 const childMatches = item.children?.filter((child) => {
+                    if (
+                        item.id === "commodity" &&
+                        !canManageCommodityCatalog(user.role) &&
+                        (child.id === "commodity-type-entry" ||
+                            child.id === "commodity-entry")
+                    ) {
+                        return false;
+                    }
+
                     if (!query) return true;
                     return (
                         child.label.toLowerCase().includes(query) ||
@@ -62,7 +72,7 @@ export function useDashboardSidebarGroups({
 
                 items.push({
                     ...item,
-                    children: query ? (childMatches ?? []) : item.children,
+                    children: childMatches,
                 });
             }
 
@@ -139,6 +149,46 @@ export function useQuickActions({
             },
         ];
 
+        const addNavItemAction = (
+            id: string,
+            label: string,
+            description: string,
+            icon: QuickAction["icon"],
+            keywords: string[],
+        ) => {
+            actions.push({
+                id,
+                label,
+                description,
+                icon,
+                keywords,
+                run: () => {
+                    setActiveNavId(id);
+                    setSidebarCollapsed(true);
+                },
+            });
+        };
+
+        const addNavChildAction = (
+            id: string,
+            label: string,
+            description: string,
+            icon: QuickAction["icon"],
+            keywords: string[],
+        ) => {
+            actions.push({
+                id,
+                label,
+                description,
+                icon,
+                keywords,
+                run: () => {
+                    setActiveNavId(id);
+                    setSidebarCollapsed(true);
+                },
+            });
+        };
+
         for (const section of NAV_SECTIONS) {
             if (
                 section.title === "Admin" &&
@@ -148,15 +198,71 @@ export function useQuickActions({
             }
 
             for (const item of section.items) {
+                const itemKeywords = [
+                    item.label.toLowerCase(),
+                    section.title.toLowerCase(),
+                ];
+
+                if (item.id === "commodity") {
+                    addNavItemAction(
+                        item.id,
+                        item.label,
+                        item.description,
+                        item.icon,
+                        itemKeywords,
+                    );
+
+                    for (const child of item.children ?? []) {
+                        addNavChildAction(
+                            child.id,
+                            child.label,
+                            child.description,
+                            child.icon,
+                            [
+                                child.label.toLowerCase(),
+                                item.label.toLowerCase(),
+                                section.title.toLowerCase(),
+                                "commodity",
+                            ],
+                        );
+                    }
+
+                    continue;
+                }
+
+                if (item.id === "party") {
+                    addNavItemAction(
+                        item.id,
+                        item.label,
+                        item.description,
+                        item.icon,
+                        itemKeywords,
+                    );
+
+                    for (const child of item.children ?? []) {
+                        addNavChildAction(
+                            child.id,
+                            child.label,
+                            child.description,
+                            child.icon,
+                            [
+                                child.label.toLowerCase(),
+                                item.label.toLowerCase(),
+                                section.title.toLowerCase(),
+                                "party",
+                            ],
+                        );
+                    }
+
+                    continue;
+                }
+
                 actions.push({
                     id: item.id,
                     label: item.label,
                     description: item.description,
                     icon: item.icon,
-                    keywords: [
-                        item.label.toLowerCase(),
-                        section.title.toLowerCase(),
-                    ],
+                    keywords: itemKeywords,
                     run: () => {
                         setActiveNavId(item.id);
                         setSidebarCollapsed(true);
@@ -243,7 +349,7 @@ export function useQuickActions({
     }, [actionSearch, quickActions]);
 
     const paletteResults = useMemo(() => {
-        if (!paletteSearch.trim()) return quickActions.slice(0, 8);
+        if (!paletteSearch.trim()) return quickActions.slice(0, 5);
 
         const query = paletteSearch.toLowerCase();
         return quickActions

@@ -102,7 +102,7 @@ public class SecurityConfig {
                         // Any authenticated user can access
                         .requestMatchers(
                                 ApiPaths.FIRM + ApiPaths.FIRM_PROFILE_FETCH,
-                                ApiPaths.COMMODITY_TYPE + ApiPaths.COMMODITY_TYPE_FETCH + "/**"
+                                ApiPaths.COMMODITY_TYPE + ApiPaths.COMMODITY_TYPE_FETCH_ALL + "/**"
                         ).authenticated()
 
                         // Owner and Manager

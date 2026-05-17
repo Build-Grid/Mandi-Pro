@@ -11,10 +11,11 @@ import {
 } from "../hooks";
 import Sidebar from "./Sidebar";
 import Topbar from "./topbar/Topbar";
+import { CommodityPanel } from "@/features/dashboard/components/panels/CommodityPanel";
+import { PartyPanel } from "@/features/dashboard/components/panels/PartyPanel";
 import {
     OverviewWidgets,
     TradePanel,
-    CommodityPanel,
     LedgerPanel,
     ReportsPanel,
     AdminPanel,
@@ -235,9 +236,13 @@ export default function DashboardLayout({
                         ) : null}
 
                         {!isLoading &&
-                        activeNode.parentLabel === "Commodity" &&
+                        activeNode.parentLabel === "Commodities" &&
                         data ? (
-                            <CommodityPanel inventory={data.inventory} />
+                            <CommodityPanel currentUser={user} />
+                        ) : null}
+
+                        {!isLoading && activeNode.parentLabel === "Parties" ? (
+                            <PartyPanel currentUser={user} />
                         ) : null}
 
                         {!isLoading &&

@@ -4,6 +4,7 @@ import {
     Banknote,
     BarChart3,
     BookText,
+    Boxes,
     CirclePlus,
     ClipboardList,
     FileChartColumnIncreasing,
@@ -12,9 +13,19 @@ import {
     LayoutDashboard,
     LineChart,
     Package,
+    PackagePlus,
     Settings2,
+    Shapes,
+    Tags,
     UserPlus,
+    Users,
 } from "lucide-react";
+
+import type { RoleConstants } from "@/common/types";
+
+export function canManageCommodityCatalog(role: RoleConstants) {
+    return role === "OWNER" || role === "MANAGER";
+}
 
 export type NavChild = {
     id: string;
@@ -62,13 +73,13 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "trade-create",
-                        label: "Create trade entry",
+                        label: "Trade Entry",
                         description: "Open a new sale or purchase record",
                         icon: CirclePlus,
                     },
                     {
                         id: "trade-list",
-                        label: "Trade entries",
+                        label: "Trade Logs",
                         description: "Review recent deals and settlements",
                         icon: ClipboardList,
                     },
@@ -82,20 +93,52 @@ export const NAV_SECTIONS: NavSection[] = [
             },
             {
                 id: "commodity",
-                label: "Commodity",
-                description: "Crop and stock catalog",
+                label: "Commodities",
+                description: "Commodity and stock management",
                 icon: Package,
                 children: [
                     {
-                        id: "commodity-add",
-                        label: "Add commodity",
-                        description: "Create new crop or bag types",
-                        icon: CirclePlus,
+                        id: "commodity-type-entry",
+                        label: "Type Entry",
+                        description: "Create commodity categories",
+                        icon: Shapes,
+                    },
+                    {
+                        id: "commodity-entry",
+                        label: "Commodity Entry",
+                        description: "Add new commodities and stock items",
+                        icon: PackagePlus,
+                    },
+                    {
+                        id: "commodity-type-catalog",
+                        label: "Type Catalog",
+                        description: "View and manage all commodity types",
+                        icon: Tags,
                     },
                     {
                         id: "commodity-catalog",
-                        label: "Commodity catalog",
-                        description: "View all active stock items",
+                        label: "Commodity Catalog",
+                        description: "View and manage all commodities",
+                        icon: Boxes,
+                    },
+                ],
+            },
+            {
+                id: "party",
+                label: "Parties",
+                description: "Farmer, dealer and broker management",
+                icon: Users,
+                children: [
+                    {
+                        id: "party-entry",
+                        label: "Party Entry",
+                        description: "Create Farmer, dealer, or broker records",
+                        icon: CirclePlus,
+                    },
+                    {
+                        id: "party-catalog",
+                        label: "Party Catalog",
+                        description: "View and manage all party records",
                         icon: ClipboardList,
                     },
                 ],
@@ -113,13 +156,13 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "inventory-stock",
-                        label: "Stock movement",
+                        label: "Stock Movement",
                         description: "Inspect in-flow and out-flow",
                         icon: ClipboardList,
                     },
                     {
                         id: "inventory-alerts",
-                        label: "Low stock alerts",
+                        label: "Low Stock Alerts",
                         description: "Review replenishment warnings",
                         icon: HandCoins,
                     },
@@ -133,13 +176,13 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "ledger-claims",
-                        label: "Claims register",
+                        label: "Claims Register",
                         description: "Customer and broker claim tracking",
                         icon: HandCoins,
                     },
                     {
                         id: "ledger-journal",
-                        label: "Journal entries",
+                        label: "Journal Entries",
                         description: "Adjustments, advances, and balance",
                         icon: ClipboardList,
                     },
@@ -153,13 +196,13 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "expenses-log",
-                        label: "Log expense",
+                        label: "Log Expense",
                         description: "Record transport or handling cost",
                         icon: CirclePlus,
                     },
                     {
                         id: "expenses-view",
-                        label: "Expense ledger",
+                        label: "Expense Ledger",
                         description: "Review recurring spending",
                         icon: ClipboardList,
                     },
@@ -178,13 +221,13 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "reports-profit",
-                        label: "Profit & loss",
+                        label: "Profit & Loss",
                         description: "Monthly performance summary",
                         icon: BarChart3,
                     },
                     {
                         id: "reports-growth",
-                        label: "Growth trends",
+                        label: "Growth Trends",
                         description: "Compare branch and commodity trends",
                         icon: Globe,
                     },
@@ -198,7 +241,7 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "marketplace-pricing",
-                        label: "Pricing board",
+                        label: "Pricing Board",
                         description: "Live commodity price board",
                         icon: BarChart3,
                     },
@@ -217,13 +260,13 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: "admin-users",
-                        label: "Manage users",
+                        label: "Manage Users",
                         description: "Invite staff and manage roles",
                         icon: UserPlus,
                     },
                     {
                         id: "admin-firm",
-                        label: "Firm settings",
+                        label: "Firm Settings",
                         description: "Company details and security",
                         icon: Settings2,
                     },
