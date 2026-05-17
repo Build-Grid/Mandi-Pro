@@ -4,6 +4,7 @@ import com.buildgrid.mandipro.constants.LogMessages;
 import com.buildgrid.mandipro.constants.Status;
 import com.buildgrid.mandipro.dto.mapper.PartyMapper;
 import com.buildgrid.mandipro.dto.request.PartyRequest;
+import com.buildgrid.mandipro.dto.request.PartyUpdateRequest;
 import com.buildgrid.mandipro.dto.response.PartyResponse;
 import com.buildgrid.mandipro.entity.Firm;
 import com.buildgrid.mandipro.entity.Party;
@@ -22,6 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
+import static com.buildgrid.mandipro.util.ValidationUtil.assertFirmActive;
+import static com.buildgrid.mandipro.util.ValidationUtil.sanitizeTrimToNull;
 
 @Slf4j
 @Service
@@ -68,18 +73,29 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     @Transactional
-    public PartyResponse updateParty(Long id, PartyRequest request) {
+    public PartyResponse updateParty(Long id, PartyUpdateRequest request) {
         log.info(LogMessages.OPERATION_STARTED, "party.update", TraceIdUtil.get());
         Party party = fetchPartyFromIdOrThrow(id);
+        sanitizePartyUpdateRequest(request);
 
-        party.setName(request.getName());
-        party.setType(request.getType());
-        party.setContactNumber(request.getContactNumber());
-        party.setAddress(request.getAddress());
+        Optional.ofNullable(request.getName()).ifPresent(party::setName);
+        Optional.ofNullable(request.getType()).ifPresent(party::setType);
+        Optional.ofNullable(request.getContactNumber()).ifPresent(party::setContactNumber);
+        Optional.ofNullable(request.getAddress()).ifPresent(party::setAddress);
+        Optional.ofNullable(request.getVillage()).ifPresent(party::setVillage);
+        Optional.ofNullable(request.getDescription()).ifPresent(party::setDescription);
 
         Party updatedParty = partyRepository.save(party);
         log.info(LogMessages.OPERATION_COMPLETED, "party.update", TraceIdUtil.get());
         return partyMapper.toResponse(updatedParty);
+    }
+
+    private void sanitizePartyUpdateRequest(PartyUpdateRequest request) {
+        request.setName(sanitizeTrimToNull(request.getName()));
+        request.setContactNumber(sanitizeTrimToNull(request.getContactNumber()));
+        request.setAddress(sanitizeTrimToNull(request.getAddress()));
+        request.setVillage(sanitizeTrimToNull(request.getVillage()));
+        request.setDescription(sanitizeTrimToNull(request.getDescription()));
     }
 
     @Override
@@ -148,16 +164,5 @@ public class PartyServiceImpl implements PartyService {
         assertFirmActive(firm, "party.access");
 
         return firm.getId();
-    }
-
-    private void assertFirmActive(Firm firm, String operationName) {
-        if (firm.getStatus() != Status.ACTIVE) {
-            log.warn(LogMessages.FIRM_INACTIVE_BLOCKED,
-                    operationName,
-                    firm.getId(),
-                    firm.getStatus(),
-                    TraceIdUtil.get());
-            throw new AppException("Firm is no longer active", HttpStatus.FORBIDDEN);
-        }
     }
 }

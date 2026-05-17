@@ -20,7 +20,12 @@ public class PartyRequest {
     @NotNull(message = "Party type is required")
     private PartyType type;
 
+    @NotBlank(message = "Party contact number is required")
     private String contactNumber;
 
     private String address;
+
+    private String village;
+
+    private String description;
 }
